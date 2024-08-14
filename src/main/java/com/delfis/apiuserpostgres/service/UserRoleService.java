@@ -1,3 +1,10 @@
+/*
+ * Classe UserRoleService
+ * Service da entidade UserRole
+ * Autor: João Diniz Araujo
+ * Data: 13/08/2024
+ * */
+
 package com.delfis.apiuserpostgres.service;
 
 import com.delfis.apiuserpostgres.model.UserRole;
@@ -11,40 +18,38 @@ import java.util.Optional;
 public class UserRoleService {
     private final UserRoleRepository userRoleRepository;
 
-    public UserRoleService(UserRoleRepository userRoleRepository){
+    public UserRoleService(UserRoleRepository userRoleRepository) {
         this.userRoleRepository = userRoleRepository;
     }
 
     /**
      * @return todos os userRoles do banco.
      */
-    public List<UserRole> getUserRoles(){
+    public List<UserRole> getUserRoles() {
         return userRoleRepository.findAll();
     }
 
     /**
      * @return userRole pelo id.
      */
-    public UserRole getUserRoleById(long id){
-        return userRoleRepository.findById(id).orElseThrow(() -> new RuntimeException("UserRole não encontrado."));
+    public UserRole getUserRoleById(Long id) {
+        Optional<UserRole> userRole = userRoleRepository.findById(id);
+        return userRole.orElse(null);  // vai retornar userRole se ele existir, se não retorna null
     }
 
     /**
      * @return userRole deletado.
      */
-    public UserRole deleteUserRoleById(long id){
-        Optional<UserRole> userRole = userRoleRepository.findById(id);
-        if(userRole.isPresent()){
-            userRoleRepository.deleteById(id);
-            return userRole.get();
-        }
-        return null;
+    public UserRole deleteUserRoleById(Long id) {
+        UserRole userRole = getUserRoleById(id);
+        if (userRole != null) userRoleRepository.deleteById(id);
+        return userRole;
     }
 
     /**
      * @return userRole inserido.
      */
-    public UserRole saveUserRole(UserRole userRole){
+    public UserRole saveUserRole(UserRole userRole) {
         return userRoleRepository.save(userRole);
     }
 }
