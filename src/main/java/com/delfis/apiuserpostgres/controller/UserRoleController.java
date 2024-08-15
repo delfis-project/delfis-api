@@ -27,8 +27,11 @@ public class UserRoleController {
     }
 
     @GetMapping("/get-all")
-    public List<UserRole> getUserRoles() {
-        return userRoleService.getUserRoles();
+    public ResponseEntity<?> getUserRoles() {
+        List<UserRole> users = userRoleService.getUserRoles();
+        return users.size() > 0
+                ? ResponseEntity.status(HttpStatus.OK).body(users)
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhuma role encontrada.");
     }
 
     @PostMapping("/insert")
@@ -60,6 +63,6 @@ public class UserRoleController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Role não encontrado.");
         }
 
-        return insertUserRole(userRole);
+        return insertUserRole(new UserRole(id, userRole.getName()));
     }
 }
