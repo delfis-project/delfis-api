@@ -36,7 +36,7 @@ public class PlanService {
      * @return plano pelo nome.
      */
     public Plan findPlanByName(String name) {
-        Optional<Plan> plan = planRepository.findPlanByName(name);
+        Optional<Plan> plan = planRepository.findPlanByNameEqualsIgnoreCase(name);
         return plan.orElse(null);
     }
 

@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface PlanRepository extends JpaRepository<Plan, Long> {
     List<Plan> findPlansByPriceIsLessThanEqual(BigDecimal price);
     List<Plan> findPlansByPriceIsGreaterThanEqual(BigDecimal price);
-    Optional<Plan> findPlanByName(String name);
+    Optional<Plan> findPlanByNameEqualsIgnoreCase(String name);
 }

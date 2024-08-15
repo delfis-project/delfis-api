@@ -9,6 +9,7 @@ package com.delfis.apiuserpostgres.controller;
 
 import com.delfis.apiuserpostgres.model.UserRole;
 import com.delfis.apiuserpostgres.service.UserRoleService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -29,18 +30,20 @@ public class UserRoleController {
     @GetMapping("/get-all")
     public ResponseEntity<?> getUserRoles() {
         List<UserRole> users = userRoleService.getUserRoles();
-        return users.size() > 0
-                ? ResponseEntity.status(HttpStatus.OK).body(users)
-                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhuma role encontrada.");
+        if (!users.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body(users);
+        }
+
+        throw new EntityNotFoundException("Nenhuma role encontrada.");
     }
 
     @PostMapping("/insert")
     public ResponseEntity<?> insertUserRole(@Valid @RequestBody UserRole userRole) {
         try {
             UserRole savedUserRole = userRoleService.saveUserRole(userRole);
-            return ResponseEntity.status(HttpStatus.OK).body(savedUserRole);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedUserRole);
         } catch (DataIntegrityViolationException dive) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Role com esse nome já existente.");
+            throw new DataIntegrityViolationException("Role com esse nome já existente.");
         }
     }
 
@@ -48,12 +51,11 @@ public class UserRoleController {
     public ResponseEntity<String> deleteUserRole(@PathVariable Long id) {
         try {
             if (userRoleService.deleteUserRoleById(id) == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Role não encontrado.");
+                throw new EntityNotFoundException("Role não encontrado.");
             }
             return ResponseEntity.status(HttpStatus.OK).body("Role deletado com sucesso.");
         } catch (DataIntegrityViolationException dive) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("Existem usuários cadastrados com essa role. Mude-os para excluir essa role.");
+            throw new DataIntegrityViolationException("Existem usuários cadastrados com essa role. Mude-os para excluir essa role.");
         }
     }
 

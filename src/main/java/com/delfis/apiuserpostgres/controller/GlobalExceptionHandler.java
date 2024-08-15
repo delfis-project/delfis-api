@@ -77,8 +77,8 @@ public class GlobalExceptionHandler {
     * */
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<String> handleEntityNotFoundException() {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Entidade não encontrada nos dados.");
+    public ResponseEntity<String> handleEntityNotFoundException(EntityNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Entidade não encontrada nos dados: " + ex.getMessage());
     }
 
     /*
