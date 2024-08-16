@@ -71,10 +71,17 @@ public class AppUser {
     @Column(name = "picture_url")
     private String pictureUrl;
 
-    // implementar dps
-    private long fk_plan_id;
-    private long fk_user_role_id;
-    //
+    @ManyToOne
+    @NotNull(message = "O usuário deve ter um plano")
+    @JoinColumn(name = "fk_plan_id")
+    @Schema(description = "Plano do usuário", example = "Premium")
+    private Plan plan;
+
+    @ManyToOne
+    @JoinColumn(name = "fk_user_role_id")
+    @Schema(description = "Papel do usuário", example = "Administrador")
+    @NotNull(message = "O usuário deve ter um papel")
+    private UserRole userRole;
 
     @NotNull(message = "A data de criação da conta não pode ser nula")
     @Past(message = "A data de criação não pode ser futura")
@@ -98,8 +105,8 @@ public class AppUser {
                    int coins,
                    LocalDate birthDate,
                    String pictureUrl,
-                   long fk_plan_id,
-                   long fk_user_role_id,
+                   Plan plan,
+                   UserRole userRole,
                    LocalDateTime createdAt,
                    LocalDateTime updatedAt) {
         this.id = id;
@@ -113,22 +120,28 @@ public class AppUser {
         this.coins = coins;
         this.birthDate = birthDate;
         this.pictureUrl = pictureUrl;
-        this.fk_plan_id = fk_plan_id;
-        this.fk_user_role_id = fk_user_role_id;
+        this.plan = plan;
+        this.userRole = userRole;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-    public AppUser(String name, String username, String password, String email, LocalDate birthDate) {
+    public AppUser(String name,
+                   String username,
+                   String password,
+                   String email,
+                   LocalDate birthDate,
+                   Plan plan,
+                   UserRole userRole) {
         this.name = name;
         this.username = username;
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         this.password = encoder.encode(password);
         this.email = email;
         this.birthDate = birthDate;
-        this.fk_plan_id = 1;
-        this.fk_user_role_id = 1;
         this.createdAt = LocalDateTime.now();
+        this.plan = plan;
+        this.userRole = userRole;
     }
 
     public long getId() {
@@ -212,20 +225,20 @@ public class AppUser {
         this.pictureUrl = pictureUrl;
     }
 
-    public long getFk_plan_id() {
-        return fk_plan_id;
+    public Plan getPlan() {
+        return plan;
     }
 
-    public void setFk_plan_id(long fk_plan_id) {
-        this.fk_plan_id = fk_plan_id;
+    public void setPlan(Plan plan) {
+        this.plan = plan;
     }
 
-    public long getFk_user_role_id() {
-        return fk_user_role_id;
+    public UserRole getUserRole() {
+        return userRole;
     }
 
-    public void setFk_user_role_id(long fk_user_role_id) {
-        this.fk_user_role_id = fk_user_role_id;
+    public void setUserRole(UserRole userRole) {
+        this.userRole = userRole;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -257,8 +270,8 @@ public class AppUser {
                 ", coins=" + coins +
                 ", birthDate=" + birthDate +
                 ", pictureUrl='" + pictureUrl + '\'' +
-                ", fk_plan_id=" + fk_plan_id +
-                ", fk_user_role_id=" + fk_user_role_id +
+                ", plan=" + plan +
+                ", userRole=" + userRole +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';
