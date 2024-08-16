@@ -23,7 +23,7 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
-@Entity
+@Entity(name = "user_role")
 @Schema(description = "Usuário base do app.")
 public class AppUser {
     @Setter

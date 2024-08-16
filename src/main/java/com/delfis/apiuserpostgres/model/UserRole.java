@@ -22,7 +22,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
-@Entity
+@Entity(name = "user_role")
 @Schema(description = "Papel do usuário no sistema.")
 public class UserRole {
     @Id
