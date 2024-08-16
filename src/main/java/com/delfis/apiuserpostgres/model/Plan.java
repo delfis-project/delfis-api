@@ -1,3 +1,10 @@
+/*
+ * Classe Plan
+ * Model da entidade Plan
+ * Autor: João Diniz Araujo
+ * Data: 15/08/2024
+ * */
+
 package com.delfis.apiuserpostgres.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;

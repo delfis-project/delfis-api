@@ -1,11 +1,16 @@
+/*
+ * Classe ControllerUtils
+ * Funções para controllers
+ * Autor: João Diniz Araujo
+ * Data: 15/08/2024
+ * */
+
 package com.delfis.apiuserpostgres.controller;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import java.util.HashMap;
 import java.util.List;

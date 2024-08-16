@@ -1,3 +1,10 @@
+/*
+ * Classe PlanRepository
+ * Repository da entidade Plan
+ * Autor: João Diniz Araujo
+ * Data: 15/08/2024
+ * */
+
 package com.delfis.apiuserpostgres.repository;
 
 import com.delfis.apiuserpostgres.model.Plan;
