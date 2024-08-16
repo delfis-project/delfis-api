@@ -26,7 +26,6 @@ import java.util.List;
 @Entity(name = "user_role")
 @Schema(description = "Usuário base do app.")
 public class AppUser {
-    @Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(description = "ID único", example = "1234")
