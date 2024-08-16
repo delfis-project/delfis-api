@@ -30,19 +30,15 @@ public class PowerupController {
     @GetMapping("/get-all")
     public ResponseEntity<?> getPowerups() {
         List<Powerup> powerups = powerupService.getPowerups();
-        if (!powerups.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.OK).body(powerups);
-        }
+        if (!powerups.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(powerups);
 
         throw new EntityNotFoundException("Nenhum powerup encontrado.");
     }
 
     @GetMapping("/get-by-name/{name}")
     public ResponseEntity<?> getPowerupByName(@PathVariable String name) {
-        Powerup powerup = powerupService.getPowerupByName(name.toUpperCase());
-        if (powerup != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(powerup);
-        }
+        Powerup powerup = powerupService.getPowerupByName(name.strip());
+        if (powerup != null) return ResponseEntity.status(HttpStatus.OK).body(powerup);
 
         throw new EntityNotFoundException("Nenhum powerup encontrado.");
     }
@@ -60,9 +56,7 @@ public class PowerupController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deletePowerup(@PathVariable Long id) {
         try {
-            if (powerupService.deletePowerupById(id) == null) {
-                throw new EntityNotFoundException("Powerup não encontrado.");
-            }
+            if (powerupService.deletePowerupById(id) == null) throw new EntityNotFoundException("Powerup não encontrado.");
             return ResponseEntity.status(HttpStatus.OK).body("Powerup deletado com sucesso.");
         } catch (DataIntegrityViolationException dive) {
             throw new DataIntegrityViolationException("Existem usuários cadastrados com esse powerup. Mude-os para excluir esse powerup.");
@@ -103,9 +97,7 @@ public class PowerupController {
 
         // validando se ele mandou algum campo errado
         Map<String, String> errors = ControllerUtils.verifyObject(existingPowerup, new ArrayList<>(updates.keySet()));
-        if (!errors.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
-        }
+        if (!errors.isEmpty()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
 
         powerupService.savePowerup(existingPowerup);
         return ResponseEntity.status(HttpStatus.OK).body("Powerup atualizado com sucesso.");

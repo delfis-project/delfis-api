@@ -30,9 +30,7 @@ public class UserRoleController {
     @GetMapping("/get-all")
     public ResponseEntity<?> getUserRoles() {
         List<UserRole> users = userRoleService.getUserRoles();
-        if (!users.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.OK).body(users);
-        }
+        if (!users.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(users);
 
         throw new EntityNotFoundException("Nenhuma role encontrada.");
     }
@@ -50,9 +48,7 @@ public class UserRoleController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteUserRole(@PathVariable Long id) {
         try {
-            if (userRoleService.deleteUserRoleById(id) == null) {
-                throw new EntityNotFoundException("Role não encontrado.");
-            }
+            if (userRoleService.deleteUserRoleById(id) == null) throw new EntityNotFoundException("Role não encontrado.");
             return ResponseEntity.status(HttpStatus.OK).body("Role deletado com sucesso.");
         } catch (DataIntegrityViolationException dive) {
             throw new DataIntegrityViolationException("Existem usuários cadastrados com essa role. Mude-os para excluir essa role.");

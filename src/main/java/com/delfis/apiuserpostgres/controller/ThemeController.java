@@ -39,7 +39,7 @@ public class ThemeController {
 
     @GetMapping("/get-by-name/{name}")
     public ResponseEntity<?> getThemeByName(@PathVariable String name) {
-        Theme theme = themeService.getThemeByName(name.toUpperCase());
+        Theme theme = themeService.getThemeByName(name.strip());
         if (theme != null) {
             return ResponseEntity.status(HttpStatus.OK).body(theme);
         }

@@ -26,7 +26,7 @@ public class PlanService {
     /**
      * @return planos pelo preço menor ou igual.
      */
-    public List<Plan> findPlansByPriceIsGreaterThanEqual(BigDecimal price) {
+    public List<Plan> getPlansByPriceIsGreaterThanEqual(BigDecimal price) {
         List<Plan> plans = planRepository.findPlansByPriceIsGreaterThanEqual(price);
         return !plans.isEmpty() ? plans : null;
     }
@@ -34,7 +34,7 @@ public class PlanService {
     /**
      * @return planos pelo preço menor ou igual.
      */
-    public List<Plan> findPlansByPriceIsLessThanEqual(BigDecimal price) {
+    public List<Plan> getPlansByPriceIsLessThanEqual(BigDecimal price) {
         List<Plan> plans = planRepository.findPlansByPriceIsLessThanEqual(price);
         return !plans.isEmpty() ? plans : null;
     }
@@ -42,7 +42,7 @@ public class PlanService {
     /**
      * @return plano pelo nome.
      */
-    public Plan findPlanByName(String name) {
+    public Plan getPlanByName(String name) {
         Optional<Plan> plan = planRepository.findPlanByNameEqualsIgnoreCase(name);
         return plan.orElse(null);
     }
