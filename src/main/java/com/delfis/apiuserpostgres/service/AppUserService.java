@@ -11,6 +11,7 @@ import com.delfis.apiuserpostgres.model.AppUser;
 import com.delfis.apiuserpostgres.model.Plan;
 import com.delfis.apiuserpostgres.model.UserRole;
 import com.delfis.apiuserpostgres.repository.AppUserRepository;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -92,6 +93,7 @@ public class AppUserService {
      * @return appUser inserido.
      */
     public AppUser saveAppUser(AppUser appUser) {
+        appUser.setPassword(new BCryptPasswordEncoder().encode(appUser.getPassword()));
         return appUserRepository.save(appUser);
     }
 }

@@ -9,6 +9,7 @@ package com.delfis.apiuserpostgres.controller;
 
 import com.delfis.apiuserpostgres.model.AppUser;
 import com.delfis.apiuserpostgres.model.Plan;
+import com.delfis.apiuserpostgres.model.Streak;
 import com.delfis.apiuserpostgres.model.UserRole;
 import com.delfis.apiuserpostgres.service.AppUserService;
 import jakarta.persistence.EntityNotFoundException;
@@ -18,7 +19,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user")
@@ -120,5 +125,60 @@ public class AppUserController {
                 appUser.getUpdatedAt(),
                 appUser.getStreaks()
         ));
+    }
+
+    @PatchMapping("/update/{id}")
+    public ResponseEntity<?> updateAppUserPartially(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
+        AppUser existingAppUser = appUserService.getAppUserById(id);  // validando se existe
+        if (existingAppUser == null) throw new EntityNotFoundException("User não encontrado.");
+
+        updates.forEach((key, value) -> {
+            try {
+                switch (key) {
+                    case "name":
+                        existingAppUser.setName((String) value);
+                        break;
+                    case "username":
+                        existingAppUser.setUsername((String) value);
+                        break;
+                    case "password":
+                        existingAppUser.setPassword((String) value);
+                        break;
+                    case "level":
+                        existingAppUser.setLevel((Integer) value);
+                        break;
+                    case "points":
+                        existingAppUser.setPoints((Integer) value);
+                        break;
+                    case "coins":
+                        existingAppUser.setCoins((Integer) value);
+                        break;
+                    case "birthDate":
+                        existingAppUser.setBirthDate((LocalDate) value);
+                        break;
+                    case "pictureUrl":
+                        existingAppUser.setPictureUrl((String) value);
+                        break;
+                    case "plan":
+                        existingAppUser.setPlan((Plan) value);
+                        break;
+                    case "userRole":
+                        existingAppUser.setUserRole((UserRole) value);
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Campo " + key + " não é atualizável.");
+                }
+            } catch (ClassCastException e) {
+                throw new IllegalArgumentException("Valor inválido para o campo " + key + ": " + e.getMessage(), e);
+            }
+        });
+
+        // validando se ele mandou algum campo errado
+        Map<String, String> errors = ControllerUtils.verifyObject(existingAppUser, new ArrayList<>(updates.keySet()));
+        if (!errors.isEmpty()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+
+        existingAppUser.setUpdatedAt(LocalDateTime.now());
+        appUserService.saveAppUser(existingAppUser);
+        return ResponseEntity.status(HttpStatus.OK).body("User atualizado com sucesso.");
     }
 }

@@ -113,8 +113,7 @@ public class AppUser {
                    UserRole userRole) {
         this.name = name;
         this.username = username;
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        this.password = encoder.encode(password);
+        this.password = password;
         this.email = email;
         this.birthDate = birthDate;
         this.createdAt = LocalDateTime.now();
