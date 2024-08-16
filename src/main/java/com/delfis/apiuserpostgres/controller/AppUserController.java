@@ -117,7 +117,8 @@ public class AppUserController {
                 appUser.getPlan(),
                 appUser.getUserRole(),
                 appUser.getCreatedAt(),
-                appUser.getUpdatedAt()
+                appUser.getUpdatedAt(),
+                appUser.getStreaks()
         ));
     }
 }
