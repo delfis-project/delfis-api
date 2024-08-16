@@ -10,14 +10,22 @@ package com.delfis.apiuserpostgres.model;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import lombok.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@EqualsAndHashCode
 @Entity
 @Schema(description = "Usuário base do app.")
 public class AppUser {
+    @Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(description = "ID único", example = "1234")
@@ -92,40 +100,6 @@ public class AppUser {
     @Column(name = "created_at")
     private LocalDateTime updatedAt;
 
-    public AppUser() {
-    }
-
-    public AppUser(long id,
-                   String name,
-                   String username,
-                   String password,
-                   String email,
-                   int level,
-                   int points,
-                   int coins,
-                   LocalDate birthDate,
-                   String pictureUrl,
-                   Plan plan,
-                   UserRole userRole,
-                   LocalDateTime createdAt,
-                   LocalDateTime updatedAt) {
-        this.id = id;
-        this.name = name;
-        this.username = username;
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        this.password = encoder.encode(password);
-        this.email = email;
-        this.level = level;
-        this.points = points;
-        this.coins = coins;
-        this.birthDate = birthDate;
-        this.pictureUrl = pictureUrl;
-        this.plan = plan;
-        this.userRole = userRole;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
-
     public AppUser(String name,
                    String username,
                    String password,
@@ -142,138 +116,5 @@ public class AppUser {
         this.createdAt = LocalDateTime.now();
         this.plan = plan;
         this.userRole = userRole;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        this.password = encoder.encode(password);
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public int getLevel() {
-        return level;
-    }
-
-    public void setLevel(int level) {
-        this.level = level;
-    }
-
-    public int getPoints() {
-        return points;
-    }
-
-    public void setPoints(int points) {
-        this.points = points;
-    }
-
-    public int getCoins() {
-        return coins;
-    }
-
-    public void setCoins(int coins) {
-        this.coins = coins;
-    }
-
-    public LocalDate getBirthDate() {
-        return birthDate;
-    }
-
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
-    }
-
-    public String getPictureUrl() {
-        return pictureUrl;
-    }
-
-    public void setPictureUrl(String pictureUrl) {
-        this.pictureUrl = pictureUrl;
-    }
-
-    public Plan getPlan() {
-        return plan;
-    }
-
-    public void setPlan(Plan plan) {
-        this.plan = plan;
-    }
-
-    public UserRole getUserRole() {
-        return userRole;
-    }
-
-    public void setUserRole(UserRole userRole) {
-        this.userRole = userRole;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    @Override
-    public String toString() {
-        return "AppUser{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", email='" + email + '\'' +
-                ", level=" + level +
-                ", points=" + points +
-                ", coins=" + coins +
-                ", birthDate=" + birthDate +
-                ", pictureUrl='" + pictureUrl + '\'' +
-                ", plan=" + plan +
-                ", userRole=" + userRole +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
     }
 }

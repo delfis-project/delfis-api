@@ -12,7 +12,14 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.*;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@EqualsAndHashCode
 @Entity
 @Schema(description = "Temas personalizados do aplicativo.")
 public class Theme {
@@ -37,61 +44,9 @@ public class Theme {
     @Column(name = "store_picture_url")
     private String storePictureUrl;
 
-    public Theme() {
-    }
-
-    public Theme(long id, String name, int price, String storePictureUrl) {
-        this.id = id;
-        this.name = name;
-        this.price = price;
-        this.storePictureUrl = storePictureUrl;
-    }
-
     public Theme(String name, int price, String storePictureUrl) {
         this.name = name;
         this.price = price;
         this.storePictureUrl = storePictureUrl;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getPrice() {
-        return price;
-    }
-
-    public void setPrice(int price) {
-        this.price = price;
-    }
-
-    public String getStorePictureUrl() {
-        return storePictureUrl;
-    }
-
-    public void setStorePictureUrl(String storePictureUrl) {
-        this.storePictureUrl = storePictureUrl;
-    }
-
-    @Override
-    public String toString() {
-        return "Theme{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", price=" + price +
-                ", storePictureUrl='" + storePictureUrl + '\'' +
-                '}';
     }
 }

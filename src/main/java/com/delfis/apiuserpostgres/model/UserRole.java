@@ -14,7 +14,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.*;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@EqualsAndHashCode
 @Entity
 @Schema(description = "Papel do usuário no sistema.")
 public class UserRole {
@@ -28,39 +35,7 @@ public class UserRole {
     @Schema(description = "Nome do papel", example = "Administrador")
     private String name;
 
-    public UserRole() {
-    }
-
-    public UserRole(long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
     public UserRole(String name) {
         this.name = name;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return "Role{" +
-                "id=" + id +
-                ", nome='" + name + '\'' +
-                '}';
     }
 }

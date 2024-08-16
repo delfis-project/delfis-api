@@ -12,7 +12,14 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.*;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@EqualsAndHashCode
 @Entity
 @Schema(description = "Powerups para os jogos")
 public class Powerup {
@@ -37,61 +44,9 @@ public class Powerup {
     @Column(name = "store_picture_url")
     private String storePictureUrl;
 
-    public Powerup() {
-    }
-
-    public Powerup(long id, String name, int price, String storePictureUrl) {
-        this.id = id;
-        this.name = name;
-        this.price = price;
-        this.storePictureUrl = storePictureUrl;
-    }
-
     public Powerup(String name, int price, String storePictureUrl) {
         this.name = name;
         this.price = price;
         this.storePictureUrl = storePictureUrl;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getPrice() {
-        return price;
-    }
-
-    public void setPrice(int price) {
-        this.price = price;
-    }
-
-    public String getStorePictureUrl() {
-        return storePictureUrl;
-    }
-
-    public void setStorePictureUrl(String storePictureUrl) {
-        this.storePictureUrl = storePictureUrl;
-    }
-
-    @Override
-    public String toString() {
-        return "Powerup{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", price=" + price +
-                ", storePictureUrl='" + storePictureUrl + '\'' +
-                '}';
     }
 }
