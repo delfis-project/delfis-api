@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -99,6 +100,9 @@ public class AppUser {
     @Past(message = "A data de atualização não pode ser futura")
     @Column(name = "created_at")
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "app_user")
+    private List<Streak> streaks;
 
     public AppUser(String name,
                    String username,
