@@ -102,7 +102,8 @@ public class PowerupController {
     public ResponseEntity<?> updatePowerup(@PathVariable Long id, @Valid @RequestBody Powerup powerup) {
         if (powerupService.getPowerupById(id) == null) throw new EntityNotFoundException("Powerup não encontrado.");
 
-        return insertPowerup(new Powerup(id, powerup.getName(), powerup.getPrice(), powerup.getStorePictureUrl()));
+        powerupService.savePowerup(powerup);
+        return ResponseEntity.status(HttpStatus.OK).body(powerup);
     }
 
     @PatchMapping("/update/{id}")

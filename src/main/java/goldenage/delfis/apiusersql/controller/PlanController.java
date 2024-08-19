@@ -127,10 +127,12 @@ public class PlanController {
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
     public ResponseEntity<?> updatePlan(@PathVariable Long id, @Valid @RequestBody Plan plan) {
-        if (planService.getPlanById(id) == null) throw new EntityNotFoundException("Plano não encontrado.");
+        if (planService.getPlanById(id) == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Plano não encontrado.");
 
-        return insertPlan(new Plan(id, plan.getName(), plan.getPrice(), plan.getDescription()));
+        planService.savePlan(plan);
+        return ResponseEntity.status(HttpStatus.OK).body(plan);
     }
+
 
     @PatchMapping("/update/{id}")
     @Operation(summary = "Atualizar parcialmente um plano", description = "Atualiza parcialmente um plano baseado no ID.")

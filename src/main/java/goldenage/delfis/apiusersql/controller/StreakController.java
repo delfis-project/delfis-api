@@ -117,12 +117,8 @@ public class StreakController {
     public ResponseEntity<?> updateStreak(@PathVariable Long id, @Valid @RequestBody Streak streak) {
         if (streakService.getStreakById(id) == null) throw new EntityNotFoundException("Streak não encontrado.");
 
-        return insertStreak(new Streak(
-                id,
-                streak.getInitialDate(),
-                streak.getFinalDate(),
-                streak.getAppUser()
-        ));
+        streakService.saveStreak(streak);
+        return ResponseEntity.status(HttpStatus.OK).body(streak);
     }
 
     @PatchMapping("/update/{id}")

@@ -113,14 +113,8 @@ public class AppUserThemeController {
     public ResponseEntity<?> updateAppUserTheme(@PathVariable Long id, @Valid @RequestBody AppUserTheme appUserTheme) {
         if (appUserThemeService.getAppUserThemeById(id) == null) throw new EntityNotFoundException("Tema não encontrado.");
 
-        return insertAppUserTheme(new AppUserTheme(
-                id,
-                appUserTheme.isInUse(),
-                appUserTheme.getTransactionPrice(),
-                appUserTheme.getTransactionDate(),
-                appUserTheme.getAppUser(),
-                appUserTheme.getTheme()
-        ));
+        appUserThemeService.saveAppUserTheme(appUserTheme);
+        return ResponseEntity.status(HttpStatus.OK).body(appUserTheme);
     }
 
     @PatchMapping("/update/{id}")

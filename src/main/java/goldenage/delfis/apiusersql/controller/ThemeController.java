@@ -102,7 +102,8 @@ public class ThemeController {
     public ResponseEntity<?> updateTheme(@PathVariable Long id, @Valid @RequestBody Theme theme) {
         if (themeService.getThemeById(id) == null) throw new EntityNotFoundException("Tema não encontrado.");
 
-        return insertTheme(new Theme(id, theme.getName(), theme.getPrice(), theme.getStorePictureUrl()));
+        themeService.saveTheme(theme);
+        return ResponseEntity.status(HttpStatus.OK).body(theme);
     }
 
     @PatchMapping("/update/{id}")

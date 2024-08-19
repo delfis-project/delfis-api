@@ -23,6 +23,7 @@ import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -133,6 +134,7 @@ public class AppUserController {
     })
     public ResponseEntity<?> insertAppUser(@Valid @RequestBody AppUser appUser) {
         try {
+            appUser.setPassword(new BCryptPasswordEncoder().encode(appUser.getPassword()));
             AppUser savedAppUser = appUserService.saveAppUser(appUser);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedAppUser);
         } catch (DataIntegrityViolationException dive) {
@@ -165,27 +167,12 @@ public class AppUserController {
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
     public ResponseEntity<?> updateAppUser(@PathVariable Long id, @Valid @RequestBody AppUser appUser) {
-        if (appUserService.getAppUserById(id) == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User não encontrado.");
-        }
+        if (appUserService.getAppUserById(id) == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User não encontrado.");
 
-        return insertAppUser(new AppUser(
-                id,
-                appUser.getName(),
-                appUser.getUsername(),
-                appUser.getPassword(),
-                appUser.getEmail(),
-                appUser.getLevel(),
-                appUser.getPoints(),
-                appUser.getCoins(),
-                appUser.getBirthDate(),
-                appUser.getPictureUrl(),
-                appUser.getPlan(),
-                appUser.getUserRole(),
-                appUser.getCreatedAt(),
-                appUser.getUpdatedAt(),
-                appUser.getStreaks()
-        ));
+        appUser.setPassword(new BCryptPasswordEncoder().encode(appUser.getPassword()));
+
+        appUserService.saveAppUser(appUser);
+        return ResponseEntity.status(HttpStatus.OK).body(appUser);
     }
 
     @PatchMapping("/update/{id}")
@@ -209,7 +196,8 @@ public class AppUserController {
                         existingAppUser.setUsername((String) value);
                         break;
                     case "password":
-                        existingAppUser.setPassword((String) value);
+                        String password = new BCryptPasswordEncoder().encode((String) value);
+                        existingAppUser.setPassword(password);
                         break;
                     case "level":
                         existingAppUser.setLevel((Integer) value);
