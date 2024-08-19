@@ -46,7 +46,7 @@ public class PlanPaymentController {
     }
 
     @GetMapping("/get-by-plan")
-    public ResponseEntity<?> getPlanPaymentsByAppUser(@RequestBody Plan plan) {
+    public ResponseEntity<?> getPlanPaymentsByPlan(@RequestBody Plan plan) {
         List<PlanPayment> planPayment = planPaymentService.getPlanPaymentByPlan(plan);
         if (planPayment != null) return ResponseEntity.status(HttpStatus.OK).body(planPayment);
 

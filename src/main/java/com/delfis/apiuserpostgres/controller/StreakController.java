@@ -46,7 +46,7 @@ public class StreakController {
     }
 
     @GetMapping("/get-by-app-user")
-    public ResponseEntity<?> getStreaksByInitialDateBefore(@RequestBody AppUser appUser) {
+    public ResponseEntity<?> getStreaksByAppUser(@RequestBody AppUser appUser) {
         List<Streak> streaks = streakService.getStreaksByAppUser(appUser);
         if (!streaks.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(streaks);
 
