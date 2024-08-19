@@ -57,9 +57,7 @@ public class UserRoleController {
 
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateUserRole(@PathVariable Long id, @Valid @RequestBody UserRole userRole) {
-        if (userRoleService.getUserRoleById(id) == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Role não encontrado.");
-        }
+        if (userRoleService.getUserRoleById(id) == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Role não encontrado.");
 
         return insertUserRole(new UserRole(id, userRole.getName()));
     }

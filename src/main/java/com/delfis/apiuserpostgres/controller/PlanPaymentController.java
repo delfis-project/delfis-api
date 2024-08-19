@@ -32,9 +32,7 @@ public class PlanPaymentController {
     @GetMapping("/get-all")
     public ResponseEntity<?> getPlanPayments() {
         List<PlanPayment> planPayments = planPaymentService.getPlanPayments();
-        if (!planPayments.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.OK).body(planPayments);
-        }
+        if (!planPayments.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(planPayments);
 
         throw new EntityNotFoundException("Nenhum pagamento encontrado.");
     }
@@ -42,9 +40,7 @@ public class PlanPaymentController {
     @GetMapping("/get-by-app-user")
     public ResponseEntity<?> getPlanPaymentsByAppUser(@RequestBody AppUser appUser) {
         List<PlanPayment> planPayment = planPaymentService.getPlanPaymentsByAppUser(appUser);
-        if (planPayment != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(planPayment);
-        }
+        if (planPayment != null) return ResponseEntity.status(HttpStatus.OK).body(planPayment);
 
         throw new EntityNotFoundException("Nenhum pagamento encontrado.");
     }
@@ -52,9 +48,7 @@ public class PlanPaymentController {
     @GetMapping("/get-by-plan")
     public ResponseEntity<?> getPlanPaymentsByAppUser(@RequestBody Plan plan) {
         List<PlanPayment> planPayment = planPaymentService.getPlanPaymentByPlan(plan);
-        if (planPayment != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(planPayment);
-        }
+        if (planPayment != null) return ResponseEntity.status(HttpStatus.OK).body(planPayment);
 
         throw new EntityNotFoundException("Nenhum pagamento encontrado.");
     }
@@ -72,9 +66,7 @@ public class PlanPaymentController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deletePlanPayment(@PathVariable Long id) {
         try {
-            if (planPaymentService.deletePlanPaymentById(id) == null) {
-                throw new EntityNotFoundException("Pagamento não encontrado.");
-            }
+            if (planPaymentService.deletePlanPaymentById(id) == null) throw new EntityNotFoundException("Pagamento não encontrado.");
             return ResponseEntity.status(HttpStatus.OK).body("Pagamento deletado com sucesso.");
         } catch (DataIntegrityViolationException dive) {
             throw new DataIntegrityViolationException("Existem planos cadastrados com esse pagamento. Mude-os para excluir esse pagamento.");

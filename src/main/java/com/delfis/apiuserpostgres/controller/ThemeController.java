@@ -30,9 +30,7 @@ public class ThemeController {
     @GetMapping("/get-all")
     public ResponseEntity<?> getThemes() {
         List<Theme> themes = themeService.getThemes();
-        if (!themes.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.OK).body(themes);
-        }
+        if (!themes.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(themes);
 
         throw new EntityNotFoundException("Nenhum tema encontrado.");
     }
@@ -40,9 +38,7 @@ public class ThemeController {
     @GetMapping("/get-by-name/{name}")
     public ResponseEntity<?> getThemeByName(@PathVariable String name) {
         Theme theme = themeService.getThemeByName(name.strip());
-        if (theme != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(theme);
-        }
+        if (theme != null) return ResponseEntity.status(HttpStatus.OK).body(theme);
 
         throw new EntityNotFoundException("Nenhum tema encontrado.");
     }
@@ -60,9 +56,7 @@ public class ThemeController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteTheme(@PathVariable Long id) {
         try {
-            if (themeService.deleteThemeById(id) == null) {
-                throw new EntityNotFoundException("Tema não encontrado.");
-            }
+            if (themeService.deleteThemeById(id) == null) throw new EntityNotFoundException("Tema não encontrado.");
             return ResponseEntity.status(HttpStatus.OK).body("Tema deletado com sucesso.");
         } catch (DataIntegrityViolationException dive) {
             throw new DataIntegrityViolationException("Existem usuários cadastrados com esse tema. Mude-os para excluir esse tema.");
@@ -103,9 +97,7 @@ public class ThemeController {
 
         // validando se ele mandou algum campo errado
         Map<String, String> errors = ControllerUtils.verifyObject(existingTheme, new ArrayList<>(updates.keySet()));
-        if (!errors.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
-        }
+        if (!errors.isEmpty()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
 
         themeService.saveTheme(existingTheme);
         return ResponseEntity.status(HttpStatus.OK).body("Tema atualizado com sucesso.");
