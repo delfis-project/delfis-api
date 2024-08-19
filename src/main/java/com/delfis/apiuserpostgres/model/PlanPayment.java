@@ -23,36 +23,38 @@ import java.time.LocalDateTime;
 @ToString
 @EqualsAndHashCode
 @Entity(name = "plan_payment")
-@Schema(description = "Pagamentos de planos.")
+@Schema(description = "Registro dos pagamentos realizados para planos de assinatura.")
 public class PlanPayment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "ID único", example = "1234")
+    @Schema(description = "ID único do pagamento", example = "1234")
     private long id;
 
     @NotNull(message = "O preço não pode ser nulo")
     @Min(value = 0, message = "O preço deve ser pelo menos 0")
-    @Schema(description = "Valor do pagamento", example = "19.99")
+    @Schema(description = "Valor do pagamento em formato decimal", example = "19.99")
     @Column(name = "price", precision = 12, scale = 2)
     private BigDecimal price;
 
     @NotNull(message = "A data de pagamento não pode ser nula")
+    @Schema(description = "Data e hora do pagamento", example = "2024-08-16T14:30:00")
     @Column(name = "payment_timestamp")
     private LocalDateTime paymentTimestamp;
 
     @NotNull(message = "A data de expiração do plano não pode ser nula")
+    @Schema(description = "Data e hora de expiração do plano", example = "2024-09-16T14:30:00")
     @Column(name = "expiration_timestamp")
     private LocalDateTime expirationTimestamp;
 
     @ManyToOne
-    @NotNull(message = "O pagamento precisa ter um plano")
+    @NotNull(message = "O pagamento precisa ter um plano associado")
     @JoinColumn(name = "fk_plan_id")
-    @Schema(description = "Plano do pagamento", example = "Premium")
+    @Schema(description = "Plano associado ao pagamento", example = "Premium")
     private Plan plan;
 
     @ManyToOne
     @JoinColumn(name = "fk_app_user_id")
-    @NotNull(message = "O pagamento deve ter um usuário")
+    @NotNull(message = "O pagamento deve ter um usuário associado")
     @Schema(description = "Usuário que realizou o pagamento", example = "jvdinizaraujo")
     private AppUser appUser;
 }

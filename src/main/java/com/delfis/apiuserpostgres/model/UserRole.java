@@ -23,15 +23,16 @@ import lombok.*;
 @ToString
 @EqualsAndHashCode
 @Entity(name = "user_role")
-@Schema(description = "Papel do usuário no sistema.")
+@Schema(description = "Define o papel de um usuário no sistema.")
 public class UserRole {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "ID único", example = "1234")
+    @Schema(description = "ID único do papel", example = "1234")
+    @NotNull(message = "O ID não pode ser nulo")
     private long id;
 
-    @NotNull(message = "O nome não pode ser nulo")
-    @Size(min = 2, max = 20, message = "O nome deve ter pelo menos 2 caracteres e no máximo 20")
-    @Schema(description = "Nome do papel", example = "Administrador")
+    @NotNull(message = "O nome do papel não pode ser nulo")
+    @Size(min = 2, max = 20, message = "O nome do papel deve ter pelo menos 2 caracteres e no máximo 20")
+    @Schema(description = "Nome do papel de usuário", example = "Administrador")
     private String name;
 }

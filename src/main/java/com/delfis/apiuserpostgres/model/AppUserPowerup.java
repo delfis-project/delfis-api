@@ -29,30 +29,30 @@ import java.time.LocalDate;
 public class AppUserPowerup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "ID único", example = "1234")
+    @Schema(description = "ID único do registro", example = "1234")
     private long id;
 
     @NotNull(message = "O valor da transação não pode ser nulo")
-    @Min(value = 0, message = "As delfiscoins deve ser pelo menos 0")
-    @Schema(description = "Delfiscoins da transação de compra do tema", example = "100")
+    @Min(value = 0, message = "O valor da transação deve ser pelo menos 0")
+    @Schema(description = "Valor da transação em delfiscoins", example = "100")
     @Column(name = "transaction_price")
     private int transactionPrice;
 
     @NotNull(message = "A data da transação não pode ser nula")
     @Past(message = "Data da transação não pode ser futura")
-    @Schema(description = "Data da transação de compra do tema", example = "20/05/2024")
+    @Schema(description = "Data da transação de compra do powerup", example = "2024-05-20")
     @Column(name = "transaction_date")
     private LocalDate transactionDate;
 
     @ManyToOne
     @JoinColumn(name = "fk_app_user_id")
-    @Schema(description = "Usuário que comprou o powerup", example = "jvdinizaraujo")
+    @Schema(description = "Usuário que comprou o powerup", example = "{ \"id\": 1234, \"username\": \"jvdinizaraujo\" }")
     @NotNull(message = "A transação deve ter um usuário")
     private AppUser appUser;
 
     @ManyToOne
     @JoinColumn(name = "fk_powerup_id")
-    @Schema(description = "Powerup que foi comprado", example = "dobro de pontos")
+    @Schema(description = "Powerup que foi comprado", example = "{ \"id\": 5678, \"name\": \"Dobro de Pontos\" }")
     @NotNull(message = "A transação deve ter um powerup")
     private Powerup powerup;
 }

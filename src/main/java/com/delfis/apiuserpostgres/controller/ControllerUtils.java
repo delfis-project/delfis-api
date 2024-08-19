@@ -18,6 +18,10 @@ import java.util.Map;
 import java.util.Set;
 
 public class ControllerUtils {
+    /*
+     * Verifica um objeto e retorna se ele está com erros.
+     * Valida com base nas annotations de cada entidade.
+     * */
     public static <T> Map<String, String> verifyObject(T obj, List<String> fields) {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();

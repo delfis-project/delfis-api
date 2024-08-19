@@ -27,7 +27,7 @@ import java.math.BigDecimal;
 public class Plan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "ID único", example = "1234")
+    @Schema(description = "ID único do plano", example = "1234")
     @NotNull(message = "ID não pode ser nulo")
     private long id;
 
@@ -37,13 +37,13 @@ public class Plan {
     private String name;
 
     @Column(name = "price", precision = 12, scale = 2)
-    @Min(value = 0, message = "O valor mínimo é zero.")
+    @Min(value = 0, message = "O valor mínimo é zero")
     @NotNull(message = "O preço não pode ser nulo")
-    @Schema(description = "Preço do plano", example = "25.99")
+    @Schema(description = "Preço do plano em formato decimal", example = "25.99")
     private BigDecimal price;
 
     @NotNull(message = "A descrição não pode ser nula")
     @Size(min = 5, max = 500, message = "A descrição deve ter pelo menos 5 caracteres e no máximo 500")
-    @Schema(description = "Descrição do plano", example = "Sem anúncios e libera X para o usuário.")
+    @Schema(description = "Descrição detalhada do plano", example = "Plano sem anúncios com acesso a recursos exclusivos e X itens adicionais.")
     private String description;
 }

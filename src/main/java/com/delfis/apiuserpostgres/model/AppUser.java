@@ -28,7 +28,7 @@ import java.util.List;
 public class AppUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "ID único", example = "1234")
+    @Schema(description = "ID único do usuário", example = "1234")
     private long id;
 
     @NotNull(message = "O nome não pode ser nulo")
@@ -71,6 +71,7 @@ public class AppUser {
     @NotNull(message = "Data de nascimento não pode ser nula")
     @Past(message = "Data de nascimento não pode ser futura")
     @Column(name = "birth_date")
+    @Schema(description = "Data de nascimento do usuário", example = "1990-05-15")
     private LocalDate birthDate;
 
     @NotNull(message = "A foto não pode ser nula")
@@ -82,24 +83,27 @@ public class AppUser {
     @ManyToOne
     @NotNull(message = "O usuário deve ter um plano")
     @JoinColumn(name = "fk_plan_id")
-    @Schema(description = "Plano do usuário", example = "Premium")
+    @Schema(description = "Plano do usuário", example = "{ \"id\": 1, \"name\": \"Premium\", \"price\": 29.99 }")
     private Plan plan;
 
     @ManyToOne
     @JoinColumn(name = "fk_user_role_id")
-    @Schema(description = "Papel do usuário", example = "Administrador")
+    @Schema(description = "Papel do usuário", example = "{ \"id\": 1, \"name\": \"Administrador\" }")
     @NotNull(message = "O usuário deve ter um papel")
     private UserRole userRole;
 
     @NotNull(message = "A data de criação da conta não pode ser nula")
     @Past(message = "A data de criação não pode ser futura")
     @Column(name = "created_at")
+    @Schema(description = "Data e hora de criação da conta", example = "2024-08-15T14:30:00")
     private LocalDateTime createdAt;
 
     @Past(message = "A data de atualização não pode ser futura")
     @Column(name = "updated_at")
+    @Schema(description = "Data e hora da última atualização da conta", example = "2024-08-18T10:00:00")
     private LocalDateTime updatedAt;
 
     @OneToMany
+    @Schema(description = "Lista de streaks do usuário", implementation = Streak.class)
     private List<Streak> streaks;
 }

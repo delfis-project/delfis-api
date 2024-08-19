@@ -29,38 +29,35 @@ import java.time.LocalDate;
 public class AppUserTheme {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "ID único", example = "1234")
+    @Schema(description = "ID único do registro", example = "1234")
     private long id;
 
     @NotNull(message = "Está em uso não pode ser nulo")
     @Schema(description = "Tema está sendo usado neste momento?", example = "true")
+    @Column(name = "is_in_use")
     private boolean isInUse;
 
     @NotNull(message = "O valor da transação não pode ser nulo")
-    @Min(value = 0, message = "As delfiscoins deve ser pelo menos 0")
+    @Min(value = 0, message = "O valor da transação deve ser pelo menos 0")
     @Schema(description = "Delfiscoins da transação de compra do tema", example = "100")
     @Column(name = "transaction_price")
     private int transactionPrice;
 
     @NotNull(message = "A data da transação não pode ser nula")
     @Past(message = "Data da transação não pode ser futura")
-    @Schema(description = "Data da transação de compra do tema", example = "20/05/2024")
+    @Schema(description = "Data da transação de compra do tema", example = "2024-05-20")
     @Column(name = "transaction_date")
     private LocalDate transactionDate;
 
     @ManyToOne
     @JoinColumn(name = "fk_app_user_id")
-    @Schema(description = "Usuário que comprou o tema", example = "jvdinizaraujo")
+    @Schema(description = "Usuário que comprou o tema", example = "{ \"id\": 1234, \"username\": \"jvdinizaraujo\" }")
     @NotNull(message = "A transação deve ter um usuário")
     private AppUser appUser;
 
     @ManyToOne
     @JoinColumn(name = "fk_theme_id")
-    @Schema(description = "Tema que foi comprado", example = "Vermelho Escuro")
+    @Schema(description = "Tema que foi comprado", example = "{ \"id\": 5678, \"name\": \"Vermelho Escuro\" }")
     @NotNull(message = "A transação deve ter um tema")
     private Theme theme;
-
-    public boolean isInUse() {
-        return isInUse;
-    }
 }
