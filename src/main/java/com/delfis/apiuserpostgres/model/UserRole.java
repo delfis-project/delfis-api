@@ -34,8 +34,4 @@ public class UserRole {
     @Size(min = 2, max = 20, message = "O nome deve ter pelo menos 2 caracteres e no máximo 20")
     @Schema(description = "Nome do papel", example = "Administrador")
     private String name;
-
-    public UserRole(String name) {
-        this.name = name;
-    }
 }

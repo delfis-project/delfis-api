@@ -46,10 +46,4 @@ public class Plan {
     @Size(min = 5, max = 500, message = "A descrição deve ter pelo menos 5 caracteres e no máximo 500")
     @Schema(description = "Descrição do plano", example = "Sem anúncios e libera X para o usuário.")
     private String description;
-
-    public Plan(String name, BigDecimal price, String description) {
-        this.name = name;
-        this.price = price;
-        this.description = description;
-    }
 }

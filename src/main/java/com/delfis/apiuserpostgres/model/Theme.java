@@ -43,10 +43,4 @@ public class Theme {
     @Schema(description = "Url da foto do tema", example = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTWP0CCdUG2O8eMxg1xgAt-yUSUEz4lt6eIkA&s")
     @Column(name = "store_picture_url")
     private String storePictureUrl;
-
-    public Theme(String name, int price, String storePictureUrl) {
-        this.name = name;
-        this.price = price;
-        this.storePictureUrl = storePictureUrl;
-    }
 }

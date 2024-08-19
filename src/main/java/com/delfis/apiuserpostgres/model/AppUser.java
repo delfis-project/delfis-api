@@ -23,7 +23,7 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
-@Entity(name = "user_role")
+@Entity(name = "app_user")
 @Schema(description = "Usuário base do app.")
 public class AppUser {
     @Id
@@ -97,26 +97,9 @@ public class AppUser {
     private LocalDateTime createdAt;
 
     @Past(message = "A data de atualização não pode ser futura")
-    @Column(name = "created_at")
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "app_user")
+    @OneToMany
     private List<Streak> streaks;
-
-    public AppUser(String name,
-                   String username,
-                   String password,
-                   String email,
-                   LocalDate birthDate,
-                   Plan plan,
-                   UserRole userRole) {
-        this.name = name;
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.birthDate = birthDate;
-        this.createdAt = LocalDateTime.now();
-        this.plan = plan;
-        this.userRole = userRole;
-    }
 }
