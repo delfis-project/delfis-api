@@ -125,6 +125,6 @@ public class AppUser {
             joinColumns = @JoinColumn(name = "fk_app_user_id"),
             inverseJoinColumns = @JoinColumn(name = "fk_theme_id")
     )
-    @Schema(description = "Lista de temas do usuário", implementation = Powerup.class)
+    @Schema(description = "Lista de temas do usuário", implementation = Theme.class)
     private List<Theme> themes;
 }
