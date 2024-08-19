@@ -2,7 +2,7 @@
  * Classe AppUserThemeService
  * Service da entidade AppUserTheme
  * Autor: João Diniz Araujo
- * Data: 15/08/2024
+ * Data: 19/08/2024
  * */
 
 package com.delfis.apiuserpostgres.service;
@@ -41,7 +41,7 @@ public class AppUserThemeService {
     /**
      * @return appUserTheme pelo appUser.
      */
-    public List<AppUserTheme> getAppUserThemeByAppUser(AppUser appUser) {
+    public List<AppUserTheme> getAppUserThemesByAppUser(AppUser appUser) {
         List<AppUserTheme> appUserThemes = appUserThemeRepository.findAppUserThemesByAppUser(appUser);
         return !appUserThemes.isEmpty() ? appUserThemes : null;
     }

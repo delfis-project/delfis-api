@@ -37,8 +37,8 @@ public class AppUserThemeController {
     }
 
     @GetMapping("/get-by-app-user")
-    public ResponseEntity<?> getAppUserThemeByAppUser(@RequestBody AppUser appUser) {
-        List<AppUserTheme> appUserTheme = appUserThemeService.getAppUserThemeByAppUser(appUser);
+    public ResponseEntity<?> getAppUserThemesByAppUser(@RequestBody AppUser appUser) {
+        List<AppUserTheme> appUserTheme = appUserThemeService.getAppUserThemesByAppUser(appUser);
         if (!appUserTheme.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(appUserTheme);
 
         throw new EntityNotFoundException("Nenhum tema encontrado.");
