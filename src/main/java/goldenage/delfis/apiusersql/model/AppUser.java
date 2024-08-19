@@ -105,4 +105,26 @@ public class AppUser {
     @OneToMany
     @Schema(description = "Lista de streaks do usuário", implementation = Streak.class)
     private List<Streak> streaks;
+
+    @OneToMany
+    @Schema(description = "Lista de pagamentos de plano do usuário", implementation = PlanPayment.class)
+    private List<PlanPayment> payments;
+
+    @ManyToMany
+    @JoinTable(
+            name = "app_user_powerup",
+            joinColumns = @JoinColumn(name = "fk_app_user_id"),
+            inverseJoinColumns = @JoinColumn(name = "fk_powerup_id")
+    )
+    @Schema(description = "Lista de powerups do usuário", implementation = Powerup.class)
+    private List<Powerup> powerups;
+
+    @ManyToMany
+    @JoinTable(
+            name = "app_user_theme",
+            joinColumns = @JoinColumn(name = "fk_app_user_id"),
+            inverseJoinColumns = @JoinColumn(name = "fk_theme_id")
+    )
+    @Schema(description = "Lista de temas do usuário", implementation = Powerup.class)
+    private List<Theme> themes;
 }
