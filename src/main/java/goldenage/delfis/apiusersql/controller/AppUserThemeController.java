@@ -23,7 +23,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/app-user-theme")
@@ -58,20 +60,6 @@ public class AppUserThemeController {
     public ResponseEntity<?> getAppUserThemesByAppUser(@RequestBody AppUser appUser) {
         List<AppUserTheme> appUserThemes = appUserThemeService.getAppUserThemesByAppUser(appUser);
         if (!appUserThemes.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(appUserThemes);
-
-        throw new EntityNotFoundException("Nenhum tema encontrado.");
-    }
-
-    @GetMapping("/get-by-app-user-and-is-in-use/{isInUse}")
-    @Operation(summary = "Obter tema por usuário e status de uso", description = "Retorna um tema baseado no usuário e no status de uso (em uso ou não).")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Tema encontrado", content = @Content(schema = @Schema(implementation = AppUserTheme.class))),
-            @ApiResponse(responseCode = "404", description = "Nenhum tema encontrado", content = @Content),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
-    })
-    public ResponseEntity<?> getAppUserThemeByAppUserAndIsInUse(@RequestBody AppUser appUser, @PathVariable boolean isInUse) {
-        AppUserTheme appUserTheme = appUserThemeService.getAppUserThemeByAppUserAndIsInUse(appUser, isInUse);
-        if (appUserTheme != null) return ResponseEntity.status(HttpStatus.OK).body(appUserTheme);
 
         throw new EntityNotFoundException("Nenhum tema encontrado.");
     }

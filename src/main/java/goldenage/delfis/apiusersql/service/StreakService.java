@@ -42,8 +42,8 @@ public class StreakService {
     /**
      * @return streak pela data de início.
      */
-    public List<Streak> getStreaksByInitalDateBefore(LocalDate initialDate) {
-        List<Streak> streaks = streakRepository.findStreaksByInitalDateBefore(initialDate);
+    public List<Streak> getStreaksByInitialDateBefore(LocalDate initialDate) {
+        List<Streak> streaks = streakRepository.findStreaksByInitialDateBefore(initialDate);
         return !streaks.isEmpty() ? streaks : null;
     }
 

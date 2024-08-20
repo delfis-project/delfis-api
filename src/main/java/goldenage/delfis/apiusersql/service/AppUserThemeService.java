@@ -47,14 +47,6 @@ public class AppUserThemeService {
     }
 
     /**
-     * @return appUserTheme pelo appUser e se ele está em uso.
-     */
-    public AppUserTheme getAppUserThemeByAppUserAndIsInUse(AppUser appUser, boolean isInUse) {
-        Optional<AppUserTheme> appUserTheme = appUserThemeRepository.findAppUserThemeByAppUserAndInUse(appUser, isInUse);
-        return appUserTheme.orElse(null);
-    }
-
-    /**
      * @return appUserTheme deletado.
      */
     public AppUserTheme deleteAppUserThemeById(Long id) {

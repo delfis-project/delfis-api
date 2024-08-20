@@ -24,7 +24,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/streak")
@@ -56,7 +58,7 @@ public class StreakController {
             @ApiResponse(responseCode = "404", description = "Nenhum streak encontrado", content = @Content)
     })
     public ResponseEntity<?> getStreaksByInitialDateBefore(@RequestBody LocalDate initialDate) {
-        List<Streak> streaks = streakService.getStreaksByInitalDateBefore(initialDate);
+        List<Streak> streaks = streakService.getStreaksByInitialDateBefore(initialDate);
         if (!streaks.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(streaks);
 
         throw new EntityNotFoundException("Nenhum streak encontrado.");

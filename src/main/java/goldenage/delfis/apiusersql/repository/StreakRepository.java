@@ -15,6 +15,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface StreakRepository extends JpaRepository<Streak, Long> {
-    List<Streak> findStreaksByInitalDateBefore(LocalDate initalDate);
+    List<Streak> findStreaksByInitialDateBefore(LocalDate initialDate);
     List<Streak> findStreaksByAppUserEquals(AppUser appUser);
 }
