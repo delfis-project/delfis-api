@@ -170,6 +170,7 @@ public class AppUserController {
         if (appUserService.getAppUserById(id) == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User não encontrado.");
 
         appUser.setPassword(new BCryptPasswordEncoder().encode(appUser.getPassword()));
+        appUser.setUpdatedAt(LocalDateTime.now());
 
         appUserService.saveAppUser(appUser);
         return ResponseEntity.status(HttpStatus.OK).body(appUser);
