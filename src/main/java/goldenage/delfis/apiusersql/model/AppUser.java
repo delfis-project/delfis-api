@@ -38,6 +38,7 @@ public class AppUser {
     @NotNull(message = "O apelido não pode ser nulo")
     @Size(min = 3, max = 20, message = "O apelido deve ter pelo menos 3 caracteres e no máximo 20")
     @Schema(description = "Apelido único do usuário", example = "jvdinizaraujo")
+    @Column(unique = true)
     private String username;
 
     @NotNull(message = "A senha não pode ser nula")
@@ -50,6 +51,7 @@ public class AppUser {
             regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}",
             flags = Pattern.Flag.CASE_INSENSITIVE)
     @Schema(description = "Email único do usuário", example = "jvdinizaraujo@gmail.com")
+    @Column(unique = true)
     private String email;
 
     @NotNull(message = "O level não pode ser nulo")

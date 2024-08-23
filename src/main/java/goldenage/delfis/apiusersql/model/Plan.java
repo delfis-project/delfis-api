@@ -34,6 +34,7 @@ public class Plan {
     @NotNull(message = "O nome não pode ser nulo")
     @Size(min = 2, max = 20, message = "O nome deve ter pelo menos 2 caracteres e no máximo 20")
     @Schema(description = "Nome do plano", example = "Premium")
+    @Column(unique = true)
     private String name;
 
     @Column(name = "price", precision = 12, scale = 2)
@@ -45,5 +46,6 @@ public class Plan {
     @NotNull(message = "A descrição não pode ser nula")
     @Size(min = 5, max = 500, message = "A descrição deve ter pelo menos 5 caracteres e no máximo 500")
     @Schema(description = "Descrição detalhada do plano", example = "Plano sem anúncios com acesso a recursos exclusivos e X itens adicionais.")
+    @Column(unique = true)
     private String description;
 }

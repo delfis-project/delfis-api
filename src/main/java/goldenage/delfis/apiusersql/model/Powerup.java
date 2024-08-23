@@ -31,6 +31,7 @@ public class Powerup {
     @NotNull(message = "O nome não pode ser nulo")
     @Size(min = 2, max = 30, message = "O nome deve ter pelo menos 2 caracteres e no máximo 30")
     @Schema(description = "Nome do powerup", example = "Dobro de Pontos")
+    @Column(unique = true)
     private String name;
 
     @NotNull(message = "O preço não pode ser nulo")
@@ -41,6 +42,6 @@ public class Powerup {
     @NotNull(message = "A foto não pode ser nula")
     @Size(min = 10, message = "A URL da foto deve ter pelo menos 10 caracteres")
     @Schema(description = "URL da foto do powerup", example = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTWP0CCdUG2O8eMxg1xgAt-yUSUEz4lt6eIkA&s")
-    @Column(name = "store_picture_url")
+    @Column(name = "store_picture_url", unique = true)
     private String storePictureUrl;
 }
