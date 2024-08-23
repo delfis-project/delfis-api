@@ -168,8 +168,9 @@ public class AppUserController {
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
     public ResponseEntity<?> updateAppUser(@PathVariable Long id, @Valid @RequestBody AppUser appUser) {
-        if (appUserService.getAppUserById(id) == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User não encontrado.");
+        if (appUserService.getAppUserById(id) == null) throw new EntityNotFoundException("User não encontrado.");
 
+        appUser.setId(id);
         appUser.setName(appUser.getName().strip().toUpperCase());
         appUser.setPassword(new BCryptPasswordEncoder().encode(appUser.getPassword()));
         appUser.setUpdatedAt(LocalDateTime.now());
@@ -189,6 +190,7 @@ public class AppUserController {
         AppUser existingAppUser = appUserService.getAppUserById(id);  // validando se existe
         if (existingAppUser == null) throw new EntityNotFoundException("User não encontrado.");
 
+        existingAppUser.setId(id);
         updates.forEach((key, value) -> {
             try {
                 switch (key) {

@@ -99,6 +99,7 @@ public class AppUserPowerupController {
     public ResponseEntity<?> updateAppUserPowerup(@PathVariable Long id, @Valid @RequestBody AppUserPowerup appUserPowerup) {
         if (appUserPowerupService.getAppUserPowerupById(id) == null) throw new EntityNotFoundException("Powerup não encontrado.");
 
+        appUserPowerup.setId(id);
         appUserPowerupService.saveAppUserPowerup(appUserPowerup);
         return ResponseEntity.status(HttpStatus.OK).body(appUserPowerup);
     }

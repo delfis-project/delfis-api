@@ -117,6 +117,7 @@ public class PlanPaymentController {
     public ResponseEntity<?> updatePlanPayment(@PathVariable Long id, @Valid @RequestBody PlanPayment planPayment) {
         if (planPaymentService.getPlanPaymentById(id) == null) throw new EntityNotFoundException("Pagamento não encontrado.");
 
+        planPayment.setId(id);
         planPaymentService.savePlanPayment(planPayment);
         return ResponseEntity.status(HttpStatus.OK).body(planPayment);
     }

@@ -105,6 +105,7 @@ public class ThemeController {
     public ResponseEntity<?> updateTheme(@PathVariable Long id, @Valid @RequestBody Theme theme) {
         if (themeService.getThemeById(id) == null) throw new EntityNotFoundException("Tema não encontrado.");
 
+        theme.setId(id);
         theme.setName(theme.getName().strip());
         themeService.saveTheme(theme);
         return ResponseEntity.status(HttpStatus.OK).body(theme);
@@ -121,6 +122,7 @@ public class ThemeController {
         Theme existingTheme = themeService.getThemeById(id);  // validando se existe
         if (existingTheme == null) throw new EntityNotFoundException("Tema não encontrado.");
 
+        existingTheme.setId(id);
         updates.forEach((key, value) -> {
             try {
                 switch (key) {

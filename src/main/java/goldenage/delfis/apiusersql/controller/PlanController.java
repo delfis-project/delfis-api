@@ -130,8 +130,9 @@ public class PlanController {
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
     public ResponseEntity<?> updatePlan(@PathVariable Long id, @Valid @RequestBody Plan plan) {
-        if (planService.getPlanById(id) == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Plano não encontrado.");
+        if (planService.getPlanById(id) == null) throw new EntityNotFoundException("Plano não encontrado.");
 
+        plan.setId(id);
         plan.setName(plan.getName().strip());
         planService.savePlan(plan);
         return ResponseEntity.status(HttpStatus.OK).body(plan);
@@ -149,6 +150,7 @@ public class PlanController {
         Plan existingPlan = planService.getPlanById(id);  // validando se existe
         if (existingPlan == null) throw new EntityNotFoundException("Plano não encontrado.");
 
+        existingPlan.setId(id);
         updates.forEach((key, value) -> {
             try {
                 switch (key) {

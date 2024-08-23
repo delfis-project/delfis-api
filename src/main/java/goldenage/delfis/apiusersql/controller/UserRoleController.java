@@ -88,8 +88,9 @@ public class UserRoleController {
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
     public ResponseEntity<?> updateUserRole(@PathVariable Long id, @Valid @RequestBody UserRole userRole) {
-        if (userRoleService.getUserRoleById(id) == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Role não encontrado.");
+        if (userRoleService.getUserRoleById(id) == null) throw new EntityNotFoundException("Role não encontrado.");
 
+        userRole.setId(id);
         userRole.setName(userRole.getName().strip().toUpperCase());
         userRoleService.saveUserRole(userRole);
         return ResponseEntity.status(HttpStatus.OK).body(userRole);

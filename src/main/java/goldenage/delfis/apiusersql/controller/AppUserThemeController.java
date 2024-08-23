@@ -101,6 +101,7 @@ public class AppUserThemeController {
     public ResponseEntity<?> updateAppUserTheme(@PathVariable Long id, @Valid @RequestBody AppUserTheme appUserTheme) {
         if (appUserThemeService.getAppUserThemeById(id) == null) throw new EntityNotFoundException("Tema não encontrado.");
 
+        appUserTheme.setId(id);
         appUserThemeService.saveAppUserTheme(appUserTheme);
         return ResponseEntity.status(HttpStatus.OK).body(appUserTheme);
     }
@@ -116,6 +117,7 @@ public class AppUserThemeController {
         AppUserTheme existingAppUserTheme = appUserThemeService.getAppUserThemeById(id);  // validando se existe
         if (existingAppUserTheme == null) throw new EntityNotFoundException("Tema não encontrado.");
 
+        existingAppUserTheme.setId(id);
         updates.forEach((key, value) -> {
             try {
                 if (key.equals("isInUse")) {
@@ -130,9 +132,7 @@ public class AppUserThemeController {
 
         // validando se ele mandou algum campo errado
         Map<String, String> errors = ControllerUtils.verifyObject(existingAppUserTheme, new ArrayList<>(updates.keySet()));
-        if (!errors.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
-        }
+        if (!errors.isEmpty()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
 
         appUserThemeService.saveAppUserTheme(existingAppUserTheme);
         return ResponseEntity.status(HttpStatus.OK).body("Tema atualizado com sucesso.");

@@ -119,6 +119,7 @@ public class StreakController {
     public ResponseEntity<?> updateStreak(@PathVariable Long id, @Valid @RequestBody Streak streak) {
         if (streakService.getStreakById(id) == null) throw new EntityNotFoundException("Streak não encontrado.");
 
+        streak.setId(id);
         streakService.saveStreak(streak);
         return ResponseEntity.status(HttpStatus.OK).body(streak);
     }
@@ -134,6 +135,7 @@ public class StreakController {
         Streak existingStreak = streakService.getStreakById(id);  // validando se existe
         if (existingStreak == null) throw new EntityNotFoundException("Streak não encontrado.");
 
+        existingStreak.setId(id);
         updates.forEach((key, value) -> {
             try {
                 switch (key) {

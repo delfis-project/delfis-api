@@ -105,6 +105,7 @@ public class PowerupController {
     public ResponseEntity<?> updatePowerup(@PathVariable Long id, @Valid @RequestBody Powerup powerup) {
         if (powerupService.getPowerupById(id) == null) throw new EntityNotFoundException("Powerup não encontrado.");
 
+        powerup.setId(id);
         powerup.setName(powerup.getName().strip());
         powerupService.savePowerup(powerup);
         return ResponseEntity.status(HttpStatus.OK).body(powerup);
@@ -121,6 +122,7 @@ public class PowerupController {
         Powerup existingPowerup = powerupService.getPowerupById(id);  // validando se existe
         if (existingPowerup == null) throw new EntityNotFoundException("Powerup não encontrado.");
 
+        existingPowerup.setId(id);
         updates.forEach((key, value) -> {
             try {
                 switch (key) {
