@@ -134,6 +134,7 @@ public class AppUserController {
     })
     public ResponseEntity<?> insertAppUser(@Valid @RequestBody AppUser appUser) {
         try {
+            appUser.setName(appUser.getName().strip().toUpperCase());
             appUser.setPassword(new BCryptPasswordEncoder().encode(appUser.getPassword()));
             AppUser savedAppUser = appUserService.saveAppUser(appUser);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedAppUser);
@@ -169,6 +170,7 @@ public class AppUserController {
     public ResponseEntity<?> updateAppUser(@PathVariable Long id, @Valid @RequestBody AppUser appUser) {
         if (appUserService.getAppUserById(id) == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User não encontrado.");
 
+        appUser.setName(appUser.getName().strip().toUpperCase());
         appUser.setPassword(new BCryptPasswordEncoder().encode(appUser.getPassword()));
         appUser.setUpdatedAt(LocalDateTime.now());
 
@@ -190,39 +192,20 @@ public class AppUserController {
         updates.forEach((key, value) -> {
             try {
                 switch (key) {
-                    case "name":
-                        existingAppUser.setName((String) value);
-                        break;
-                    case "username":
-                        existingAppUser.setUsername((String) value);
-                        break;
-                    case "password":
+                    case "name" -> existingAppUser.setName(((String) value).strip().toUpperCase());
+                    case "username" -> existingAppUser.setUsername((String) value);
+                    case "password" -> {
                         String password = new BCryptPasswordEncoder().encode((String) value);
                         existingAppUser.setPassword(password);
-                        break;
-                    case "level":
-                        existingAppUser.setLevel((Integer) value);
-                        break;
-                    case "points":
-                        existingAppUser.setPoints((Integer) value);
-                        break;
-                    case "coins":
-                        existingAppUser.setCoins((Integer) value);
-                        break;
-                    case "birthDate":
-                        existingAppUser.setBirthDate((LocalDate) value);
-                        break;
-                    case "pictureUrl":
-                        existingAppUser.setPictureUrl((String) value);
-                        break;
-                    case "plan":
-                        existingAppUser.setPlan((Plan) value);
-                        break;
-                    case "userRole":
-                        existingAppUser.setUserRole((UserRole) value);
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Campo " + key + " não é atualizável.");
+                    }
+                    case "level" -> existingAppUser.setLevel((Integer) value);
+                    case "points" -> existingAppUser.setPoints((Integer) value);
+                    case "coins" -> existingAppUser.setCoins((Integer) value);
+                    case "birthDate" -> existingAppUser.setBirthDate((LocalDate) value);
+                    case "pictureUrl" -> existingAppUser.setPictureUrl((String) value);
+                    case "plan" -> existingAppUser.setPlan((Plan) value);
+                    case "userRole" -> existingAppUser.setUserRole((UserRole) value);
+                    default -> throw new IllegalArgumentException("Campo " + key + " não é atualizável.");
                 }
             } catch (ClassCastException e) {
                 throw new IllegalArgumentException("Valor inválido para o campo " + key + ": " + e.getMessage(), e);

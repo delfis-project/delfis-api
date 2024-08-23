@@ -137,14 +137,9 @@ public class StreakController {
         updates.forEach((key, value) -> {
             try {
                 switch (key) {
-                    case "initialDate":
-                        existingStreak.setInitialDate((LocalDate) value);
-                        break;
-                    case "finalDate":
-                        existingStreak.setFinalDate((LocalDate) value);
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Campo " + key + " não é atualizável.");
+                    case "initialDate" -> existingStreak.setInitialDate((LocalDate) value);
+                    case "finalDate" -> existingStreak.setFinalDate((LocalDate) value);
+                    default -> throw new IllegalArgumentException("Campo " + key + " não é atualizável.");
                 }
             } catch (ClassCastException e) {
                 throw new IllegalArgumentException("Valor inválido para o campo " + key + ": " + e.getMessage(), e);

@@ -98,6 +98,7 @@ public class PlanController {
     })
     public ResponseEntity<?> insertPlan(@Valid @RequestBody Plan plan) {
         try {
+            plan.setName(plan.getName().strip());
             Plan savedPlan = planService.savePlan(plan);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedPlan);
         } catch (DataIntegrityViolationException dive) {
@@ -131,6 +132,7 @@ public class PlanController {
     public ResponseEntity<?> updatePlan(@PathVariable Long id, @Valid @RequestBody Plan plan) {
         if (planService.getPlanById(id) == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Plano não encontrado.");
 
+        plan.setName(plan.getName().strip());
         planService.savePlan(plan);
         return ResponseEntity.status(HttpStatus.OK).body(plan);
     }
@@ -150,7 +152,7 @@ public class PlanController {
         updates.forEach((key, value) -> {
             try {
                 switch (key) {
-                    case "name" -> existingPlan.setName((String) value);
+                    case "name" -> existingPlan.setName(((String) value).strip());
                     case "price" -> existingPlan.setPrice(BigDecimal.valueOf(Double.parseDouble((String) value)));
                     case "description" -> existingPlan.setDescription((String) value);
                     default -> throw new IllegalArgumentException("Campo " + key + " não é atualizável.");

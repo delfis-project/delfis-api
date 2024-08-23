@@ -71,6 +71,7 @@ public class PowerupController {
     })
     public ResponseEntity<?> insertPowerup(@Valid @RequestBody Powerup powerup) {
         try {
+            powerup.setName(powerup.getName().strip());
             Powerup savedPowerup = powerupService.savePowerup(powerup);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedPowerup);
         } catch (DataIntegrityViolationException dive) {
@@ -104,6 +105,7 @@ public class PowerupController {
     public ResponseEntity<?> updatePowerup(@PathVariable Long id, @Valid @RequestBody Powerup powerup) {
         if (powerupService.getPowerupById(id) == null) throw new EntityNotFoundException("Powerup não encontrado.");
 
+        powerup.setName(powerup.getName().strip());
         powerupService.savePowerup(powerup);
         return ResponseEntity.status(HttpStatus.OK).body(powerup);
     }
@@ -122,17 +124,10 @@ public class PowerupController {
         updates.forEach((key, value) -> {
             try {
                 switch (key) {
-                    case "name":
-                        existingPowerup.setName((String) value);
-                        break;
-                    case "price":
-                        existingPowerup.setPrice((Integer) value);
-                        break;
-                    case "storePictureUrl":
-                        existingPowerup.setStorePictureUrl((String) value);
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Campo " + key + " não é atualizável.");
+                    case "name" -> existingPowerup.setName(((String) value).strip());
+                    case "price" -> existingPowerup.setPrice((Integer) value);
+                    case "storePictureUrl" -> existingPowerup.setStorePictureUrl((String) value);
+                    default -> throw new IllegalArgumentException("Campo " + key + " não é atualizável.");
                 }
             } catch (ClassCastException e) {
                 throw new IllegalArgumentException("Valor inválido para o campo " + key + ": " + e.getMessage(), e);

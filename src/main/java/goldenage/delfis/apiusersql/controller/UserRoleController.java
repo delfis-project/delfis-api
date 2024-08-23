@@ -56,6 +56,7 @@ public class UserRoleController {
     })
     public ResponseEntity<?> insertUserRole(@Valid @RequestBody UserRole userRole) {
         try {
+            userRole.setName(userRole.getName().strip());
             UserRole savedUserRole = userRoleService.saveUserRole(userRole);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedUserRole);
         } catch (DataIntegrityViolationException dive) {
@@ -89,6 +90,7 @@ public class UserRoleController {
     public ResponseEntity<?> updateUserRole(@PathVariable Long id, @Valid @RequestBody UserRole userRole) {
         if (userRoleService.getUserRoleById(id) == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Role não encontrado.");
 
+        userRole.setName(userRole.getName().strip());
         userRoleService.saveUserRole(userRole);
         return ResponseEntity.status(HttpStatus.OK).body(userRole);
     }

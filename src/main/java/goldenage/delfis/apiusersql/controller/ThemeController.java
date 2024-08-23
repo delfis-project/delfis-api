@@ -71,6 +71,7 @@ public class ThemeController {
     })
     public ResponseEntity<?> insertTheme(@Valid @RequestBody Theme theme) {
         try {
+            theme.setName(theme.getName().strip().toUpperCase());
             Theme savedTheme = themeService.saveTheme(theme);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedTheme);
         } catch (DataIntegrityViolationException dive) {
@@ -104,6 +105,7 @@ public class ThemeController {
     public ResponseEntity<?> updateTheme(@PathVariable Long id, @Valid @RequestBody Theme theme) {
         if (themeService.getThemeById(id) == null) throw new EntityNotFoundException("Tema não encontrado.");
 
+        theme.setName(theme.getName().strip());
         themeService.saveTheme(theme);
         return ResponseEntity.status(HttpStatus.OK).body(theme);
     }
@@ -122,17 +124,10 @@ public class ThemeController {
         updates.forEach((key, value) -> {
             try {
                 switch (key) {
-                    case "name":
-                        existingTheme.setName((String) value);
-                        break;
-                    case "price":
-                        existingTheme.setPrice((Integer) value);
-                        break;
-                    case "storePictureUrl":
-                        existingTheme.setStorePictureUrl((String) value);
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Campo " + key + " não é atualizável.");
+                    case "name" -> existingTheme.setName(((String) value).strip());
+                    case "price" -> existingTheme.setPrice((Integer) value);
+                    case "storePictureUrl" -> existingTheme.setStorePictureUrl((String) value);
+                    default -> throw new IllegalArgumentException("Campo " + key + " não é atualizável.");
                 }
             } catch (ClassCastException e) {
                 throw new IllegalArgumentException("Valor inválido para o campo " + key + ": " + e.getMessage(), e);
