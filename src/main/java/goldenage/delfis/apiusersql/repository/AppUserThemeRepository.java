@@ -14,5 +14,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface AppUserThemeRepository extends JpaRepository<AppUserTheme, Long> {
-    List<AppUserTheme> findAppUserThemesByAppUser(AppUser appUser);
+    List<AppUserTheme> findAppUserThemesByAppUser_Id(Long id);
 }

@@ -34,17 +34,17 @@ public class PlanPaymentService {
     /**
      * @return planPayment pelo usuário.
      */
-    public List<PlanPayment> getPlanPaymentsByAppUser(AppUser appUser) {
+    public List<PlanPayment> getPlanPaymentsByAppUserId(Long id) {
         List<PlanPayment> planPayment = planPaymentRepository
-                .findPlanPaymentsByAppUserOrderByExpirationTimestamp(appUser);
+                .findPlanPaymentsByAppUser_IdOrderByExpirationTimestamp(id);
         return planPayment.isEmpty() ? null : planPayment;
     }
 
     /**
      * @return planPayment pelo plano.
      */
-    public List<PlanPayment> getPlanPaymentByPlan(Plan plan) {
-        List<PlanPayment> planPayment = planPaymentRepository.findPlanPaymentsByPlan(plan);
+    public List<PlanPayment> getPlanPaymentByPlanId(Long id) {
+        List<PlanPayment> planPayment = planPaymentRepository.findPlanPaymentsByPlan_Id(id);
         return planPayment.isEmpty() ? null : planPayment;
     }
 

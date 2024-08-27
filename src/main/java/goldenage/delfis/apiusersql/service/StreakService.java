@@ -50,8 +50,8 @@ public class StreakService {
     /**
      * @return streak pelo usuário.
      */
-    public List<Streak> getStreaksByAppUser(AppUser appUser) {
-        List<Streak> streaks = streakRepository.findStreaksByAppUserEquals(appUser);
+    public List<Streak> getStreaksByAppUserId(Long id) {
+        List<Streak> streaks = streakRepository.findStreaksByAppUser_IdEquals(id);
         return !streaks.isEmpty() ? streaks : null;
     }
 

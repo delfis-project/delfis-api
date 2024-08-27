@@ -3,19 +3,18 @@
  * Controller da entidade AppUserTheme
  * Autor: João Diniz Araujo
  * Data: 19/08/2024
- * */
+ */
 
 package goldenage.delfis.apiusersql.controller;
 
-import goldenage.delfis.apiusersql.model.AppUser;
 import goldenage.delfis.apiusersql.model.AppUserTheme;
 import goldenage.delfis.apiusersql.service.AppUserThemeService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -29,7 +28,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/app-user-theme")
-@Tag(name = "AppUserTheme", description = "Endpoints para gerenciamento de temas de usuários")
 public class AppUserThemeController {
     private final AppUserThemeService appUserThemeService;
 
@@ -50,15 +48,17 @@ public class AppUserThemeController {
         throw new EntityNotFoundException("Nenhum tema encontrado.");
     }
 
-    @GetMapping("/get-by-app-user")
+    @GetMapping("/get-by-app-user/{id}")
     @Operation(summary = "Obter temas por usuário", description = "Retorna uma lista de temas baseados no usuário.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de temas encontrada", content = @Content(schema = @Schema(implementation = AppUserTheme.class))),
             @ApiResponse(responseCode = "404", description = "Nenhum tema encontrado", content = @Content),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
+            @ApiResponse(responseCode = "400", description = "ID do usuário inválido", content = @Content)
     })
-    public ResponseEntity<?> getAppUserThemesByAppUser(@RequestBody AppUser appUser) {
-        List<AppUserTheme> appUserThemes = appUserThemeService.getAppUserThemesByAppUser(appUser);
+    public ResponseEntity<?> getAppUserThemesByAppUserId(
+            @Parameter(description = "ID do usuário para buscar temas", required = true)
+            @PathVariable Long id) {
+        List<AppUserTheme> appUserThemes = appUserThemeService.getAppUserThemesByAppUserId(id);
         if (!appUserThemes.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(appUserThemes);
 
         throw new EntityNotFoundException("Nenhum tema encontrado.");
@@ -70,7 +70,9 @@ public class AppUserThemeController {
             @ApiResponse(responseCode = "201", description = "Tema criado com sucesso", content = @Content(schema = @Schema(implementation = AppUserTheme.class))),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> insertAppUserTheme(@Valid @RequestBody AppUserTheme appUserTheme) {
+    public ResponseEntity<?> insertAppUserTheme(
+            @Parameter(description = "Dados do novo tema de usuário", required = true)
+            @Valid @RequestBody AppUserTheme appUserTheme) {
         AppUserTheme savedAppUserTheme = appUserThemeService.saveAppUserTheme(appUserTheme);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedAppUserTheme);
     }
@@ -82,7 +84,9 @@ public class AppUserThemeController {
             @ApiResponse(responseCode = "404", description = "Tema não encontrado", content = @Content),
             @ApiResponse(responseCode = "409", description = "Conflito - Existem usuários cadastrados com esse tema", content = @Content)
     })
-    public ResponseEntity<String> deleteAppUserTheme(@PathVariable Long id) {
+    public ResponseEntity<String> deleteAppUserTheme(
+            @Parameter(description = "ID do tema a ser deletado", required = true)
+            @PathVariable Long id) {
         try {
             if (appUserThemeService.deleteAppUserThemeById(id) == null) throw new EntityNotFoundException("Tema não encontrado.");
             return ResponseEntity.status(HttpStatus.OK).body("Tema deletado com sucesso.");
@@ -98,7 +102,11 @@ public class AppUserThemeController {
             @ApiResponse(responseCode = "404", description = "Tema não encontrado", content = @Content),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> updateAppUserTheme(@PathVariable Long id, @Valid @RequestBody AppUserTheme appUserTheme) {
+    public ResponseEntity<?> updateAppUserTheme(
+            @Parameter(description = "ID do tema a ser atualizado", required = true)
+            @PathVariable Long id,
+            @Parameter(description = "Novos dados do tema de usuário", required = true)
+            @Valid @RequestBody AppUserTheme appUserTheme) {
         if (appUserThemeService.getAppUserThemeById(id) == null) throw new EntityNotFoundException("Tema não encontrado.");
 
         appUserTheme.setId(id);
@@ -113,11 +121,14 @@ public class AppUserThemeController {
             @ApiResponse(responseCode = "404", description = "Tema não encontrado", content = @Content),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> updateAppUserThemePartially(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
-        AppUserTheme existingAppUserTheme = appUserThemeService.getAppUserThemeById(id);  // validando se existe
+    public ResponseEntity<?> updateAppUserThemePartially(
+            @Parameter(description = "ID do tema a ser parcialmente atualizado", required = true)
+            @PathVariable Long id,
+            @Parameter(description = "Campos a serem atualizados", required = true)
+            @RequestBody Map<String, Object> updates) {
+        AppUserTheme existingAppUserTheme = appUserThemeService.getAppUserThemeById(id);
         if (existingAppUserTheme == null) throw new EntityNotFoundException("Tema não encontrado.");
 
-        existingAppUserTheme.setId(id);
         updates.forEach((key, value) -> {
             try {
                 if (key.equals("isInUse")) {
@@ -130,7 +141,6 @@ public class AppUserThemeController {
             }
         });
 
-        // validando se ele mandou algum campo errado
         Map<String, String> errors = ControllerUtils.verifyObject(existingAppUserTheme, new ArrayList<>(updates.keySet()));
         if (!errors.isEmpty()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
 

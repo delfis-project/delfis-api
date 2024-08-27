@@ -14,5 +14,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface AppUserPowerupRepository extends JpaRepository<AppUserPowerup, Long> {
-    List<AppUserPowerup> findAppUserPowerupsByAppUser(AppUser appUser);
+    List<AppUserPowerup> findAppUserPowerupsByAppUser_Id(Long id);
 }

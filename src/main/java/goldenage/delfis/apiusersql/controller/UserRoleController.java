@@ -10,23 +10,22 @@ package goldenage.delfis.apiusersql.controller;
 import goldenage.delfis.apiusersql.model.UserRole;
 import goldenage.delfis.apiusersql.service.UserRoleService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/user-role")
-@Tag(name = "UserRole", description = "Endpoints para gerenciamento de roles de usuário")
 public class UserRoleController {
     private final UserRoleService userRoleService;
 
@@ -40,9 +39,9 @@ public class UserRoleController {
             @ApiResponse(responseCode = "200", description = "Lista de roles encontrada", content = @Content(schema = @Schema(implementation = UserRole.class))),
             @ApiResponse(responseCode = "404", description = "Nenhuma role encontrada", content = @Content)
     })
-    public ResponseEntity<?> getUserRoles() {
+    public ResponseEntity<List<UserRole>> getUserRoles() {
         List<UserRole> userRoles = userRoleService.getUserRoles();
-        if (!userRoles.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(userRoles);
+        if (!userRoles.isEmpty()) return ResponseEntity.ok(userRoles);
 
         throw new EntityNotFoundException("Nenhuma role encontrada.");
     }
@@ -54,13 +53,15 @@ public class UserRoleController {
             @ApiResponse(responseCode = "409", description = "Conflito - Role já existente", content = @Content),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> insertUserRole(@Valid @RequestBody UserRole userRole) {
+    public ResponseEntity<UserRole> insertUserRole(
+            @Parameter(description = "Dados da nova role de usuário", required = true)
+            @Valid @RequestBody UserRole userRole) {
         try {
             userRole.setName(userRole.getName().strip().toUpperCase());
             UserRole savedUserRole = userRoleService.saveUserRole(userRole);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedUserRole);
         } catch (DataIntegrityViolationException dive) {
-            throw new DataIntegrityViolationException("Role com esse nome já existente.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
     }
 
@@ -71,12 +72,14 @@ public class UserRoleController {
             @ApiResponse(responseCode = "404", description = "Role não encontrado", content = @Content),
             @ApiResponse(responseCode = "409", description = "Conflito - Existem usuários cadastrados com essa role", content = @Content)
     })
-    public ResponseEntity<String> deleteUserRole(@PathVariable Long id) {
+    public ResponseEntity<String> deleteUserRole(
+            @Parameter(description = "ID da role de usuário a ser deletada", required = true)
+            @PathVariable Long id) {
         try {
-            if (userRoleService.deleteUserRoleById(id) == null) throw new EntityNotFoundException("Role não encontrado.");
-            return ResponseEntity.status(HttpStatus.OK).body("Role deletado com sucesso.");
+            if (userRoleService.deleteUserRoleById(id) == null) throw new EntityNotFoundException("Role não encontrada.");
+            return ResponseEntity.ok("Role deletada com sucesso.");
         } catch (DataIntegrityViolationException dive) {
-            throw new DataIntegrityViolationException("Existem usuários cadastrados com essa role. Mude-os para excluir essa role.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Existem usuários cadastrados com essa role. Mude-os para excluir essa role.");
         }
     }
 
@@ -87,12 +90,16 @@ public class UserRoleController {
             @ApiResponse(responseCode = "404", description = "Role não encontrado", content = @Content),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> updateUserRole(@PathVariable Long id, @Valid @RequestBody UserRole userRole) {
-        if (userRoleService.getUserRoleById(id) == null) throw new EntityNotFoundException("Role não encontrado.");
+    public ResponseEntity<UserRole> updateUserRole(
+            @Parameter(description = "ID da role de usuário a ser atualizada", required = true)
+            @PathVariable Long id,
+            @Parameter(description = "Dados atualizados da role de usuário", required = true)
+            @Valid @RequestBody UserRole userRole) {
+        if (userRoleService.getUserRoleById(id) == null) throw new EntityNotFoundException("Role não encontrada.");
 
         userRole.setId(id);
         userRole.setName(userRole.getName().strip().toUpperCase());
-        userRoleService.saveUserRole(userRole);
-        return ResponseEntity.status(HttpStatus.OK).body(userRole);
+        UserRole updatedUserRole = userRoleService.saveUserRole(userRole);
+        return ResponseEntity.ok(updatedUserRole);
     }
 }

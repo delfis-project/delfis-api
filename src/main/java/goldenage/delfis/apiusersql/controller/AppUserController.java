@@ -12,12 +12,12 @@ import goldenage.delfis.apiusersql.model.Plan;
 import goldenage.delfis.apiusersql.model.UserRole;
 import goldenage.delfis.apiusersql.service.AppUserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -34,7 +34,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/app-user")
-@Tag(name = "AppUser", description = "Endpoints para gerenciamento de usuários")
 public class AppUserController {
     private final AppUserService appUserService;
 
@@ -52,19 +51,21 @@ public class AppUserController {
         List<AppUser> users = appUserService.getAppUsers();
         if (!users.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(users);
 
-        throw new EntityNotFoundException("Nenhum user encontrado.");
+        throw new EntityNotFoundException("Nenhum usuário encontrado.");
     }
 
     @GetMapping("/get-by-username/{username}")
-    @Operation(summary = "Obter usuário por username", description = "Retorna um usuário baseado no seu username.")
+    @Operation(summary = "Obter usuário por nome de usuário", description = "Retorna um usuário baseado no seu nome de usuário.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Usuário encontrado", content = @Content(schema = @Schema(implementation = AppUser.class))),
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado", content = @Content),
             @ApiResponse(responseCode = "400", description = "Argumento inválido", content = @Content)
     })
-    public ResponseEntity<?> getAppUserByUsername(@PathVariable String username) {
+    public ResponseEntity<?> getAppUserByUsername(
+            @Parameter(description = "Nome de usuário do usuário", required = true)
+            @PathVariable String username) {
         AppUser user = appUserService.getAppUserByUsername(username);
-        if (user == null) throw new EntityNotFoundException("Nenhum user encontrado.");
+        if (user == null) throw new EntityNotFoundException("Nenhum usuário encontrado.");
 
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
@@ -76,39 +77,45 @@ public class AppUserController {
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado", content = @Content),
             @ApiResponse(responseCode = "400", description = "Argumento inválido", content = @Content)
     })
-    public ResponseEntity<?> getAppUserByEmail(@PathVariable String email) {
+    public ResponseEntity<?> getAppUserByEmail(
+            @Parameter(description = "Email do usuário", required = true)
+            @PathVariable String email) {
         AppUser user = appUserService.getAppUserByEmail(email);
-        if (user == null) throw new EntityNotFoundException("Nenhum user encontrado.");
+        if (user == null) throw new EntityNotFoundException("Nenhum usuário encontrado.");
 
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
-    @GetMapping("/get-by-plan")
-    @Operation(summary = "Obter usuários por plano", description = "Retorna uma lista de usuários baseados em seu plano.")
+    @GetMapping("/get-by-plan/{id}")
+    @Operation(summary = "Obter usuários por plano", description = "Retorna uma lista de usuários associados a um plano específico.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de usuários encontrada", content = @Content(array = @ArraySchema(schema = @Schema(implementation = AppUser.class)))),
             @ApiResponse(responseCode = "404", description = "Nenhum usuário encontrado", content = @Content),
-            @ApiResponse(responseCode = "400", description = "Argumento inválido", content = @Content)
+            @ApiResponse(responseCode = "400", description = "ID do plano inválido", content = @Content)
     })
-    public ResponseEntity<?> getAppUsersByPlan(@RequestBody Plan plan) {
-        List<AppUser> users = appUserService.getAppUsersByPlan(plan);
+    public ResponseEntity<?> getAppUsersByPlanId(
+            @Parameter(description = "ID do plano", required = true)
+            @PathVariable Long id) {
+        List<AppUser> users = appUserService.getAppUsersByPlanId(id);
         if (!users.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(users);
 
-        throw new EntityNotFoundException("Nenhum user encontrado.");
+        throw new EntityNotFoundException("Nenhum usuário encontrado.");
     }
 
-    @GetMapping("/get-by-user-role")
-    @Operation(summary = "Obter usuários por função", description = "Retorna uma lista de usuários baseados em sua função.")
+    @GetMapping("/get-by-user-role/{id}")
+    @Operation(summary = "Obter usuários por função", description = "Retorna uma lista de usuários associados a uma função específica.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de usuários encontrada", content = @Content(array = @ArraySchema(schema = @Schema(implementation = AppUser.class)))),
             @ApiResponse(responseCode = "404", description = "Nenhum usuário encontrado", content = @Content),
-            @ApiResponse(responseCode = "400", description = "Argumento inválido", content = @Content)
+            @ApiResponse(responseCode = "400", description = "ID da função inválido", content = @Content)
     })
-    public ResponseEntity<?> getAppUsersByUserRole(@RequestBody UserRole userRole) {
-        List<AppUser> users = appUserService.getAppUsersByUserRole(userRole);
+    public ResponseEntity<?> getAppUsersByUserRoleId(
+            @Parameter(description = "ID da função do usuário", required = true)
+            @PathVariable Long id) {
+        List<AppUser> users = appUserService.getAppUsersByUserRoleId(id);
         if (!users.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(users);
 
-        throw new EntityNotFoundException("Nenhum user encontrado.");
+        throw new EntityNotFoundException("Nenhum usuário encontrado.");
     }
 
     @GetMapping("/leaderboard")
@@ -116,13 +123,13 @@ public class AppUserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de usuários encontrada", content = @Content(array = @ArraySchema(schema = @Schema(implementation = AppUser.class)))),
             @ApiResponse(responseCode = "404", description = "Nenhum usuário encontrado", content = @Content),
-            @ApiResponse(responseCode = "400", description = "Argumento inválido", content = @Content)
+            @ApiResponse(responseCode = "400", description = "Erro na requisição", content = @Content)
     })
     public ResponseEntity<?> getLeaderboard() {
         List<AppUser> users = appUserService.getLeaderboard();
         if (!users.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(users);
 
-        throw new EntityNotFoundException("Nenhum user encontrado.");
+        throw new EntityNotFoundException("Nenhum usuário encontrado.");
     }
 
     @PostMapping("/insert")
@@ -132,14 +139,16 @@ public class AppUserController {
             @ApiResponse(responseCode = "409", description = "Conflito - Usuário com nome já existente", content = @Content),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> insertAppUser(@Valid @RequestBody AppUser appUser) {
+    public ResponseEntity<?> insertAppUser(
+            @Parameter(description = "Dados do novo usuário", required = true)
+            @Valid @RequestBody AppUser appUser) {
         try {
             appUser.setName(appUser.getName().strip().toUpperCase());
             appUser.setPassword(new BCryptPasswordEncoder().encode(appUser.getPassword()));
             AppUser savedAppUser = appUserService.saveAppUser(appUser);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedAppUser);
         } catch (DataIntegrityViolationException dive) {
-            throw new DataIntegrityViolationException("User com esse nome já existente.");
+            throw new DataIntegrityViolationException("Usuário com esse nome já existente.");
         }
     }
 
@@ -149,14 +158,16 @@ public class AppUserController {
             @ApiResponse(responseCode = "200", description = "Usuário deletado com sucesso", content = @Content),
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado", content = @Content),
             @ApiResponse(responseCode = "409", description = "Conflito - Existem dependências para esse usuário", content = @Content),
-            @ApiResponse(responseCode = "400", description = "Argumento inválido", content = @Content)
+            @ApiResponse(responseCode = "400", description = "ID inválido", content = @Content)
     })
-    public ResponseEntity<String> deleteAppUser(@PathVariable Long id) {
+    public ResponseEntity<String> deleteAppUser(
+            @Parameter(description = "ID do usuário a ser deletado", required = true)
+            @PathVariable Long id) {
         try {
-            if (appUserService.deleteAppUserById(id) == null) throw new EntityNotFoundException("User não encontrado.");
-            return ResponseEntity.status(HttpStatus.OK).body("User deletado com sucesso.");
+            if (appUserService.deleteAppUserById(id) == null) throw new EntityNotFoundException("Usuário não encontrado.");
+            return ResponseEntity.status(HttpStatus.OK).body("Usuário deletado com sucesso.");
         } catch (DataIntegrityViolationException dive) {
-            throw new DataIntegrityViolationException("Existem tabelas dependentes desse usuário. Mude-as para excluir esse user.");
+            throw new DataIntegrityViolationException("Existem dependências para esse usuário. Mude-as para excluir esse usuário.");
         }
     }
 
@@ -167,8 +178,12 @@ public class AppUserController {
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado", content = @Content),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> updateAppUser(@PathVariable Long id, @Valid @RequestBody AppUser appUser) {
-        if (appUserService.getAppUserById(id) == null) throw new EntityNotFoundException("User não encontrado.");
+    public ResponseEntity<?> updateAppUser(
+            @Parameter(description = "ID do usuário a ser atualizado", required = true)
+            @PathVariable Long id,
+            @Parameter(description = "Novos dados do usuário", required = true)
+            @Valid @RequestBody AppUser appUser) {
+        if (appUserService.getAppUserById(id) == null) throw new EntityNotFoundException("Usuário não encontrado.");
 
         appUser.setId(id);
         appUser.setName(appUser.getName().strip().toUpperCase());
@@ -186,9 +201,13 @@ public class AppUserController {
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado", content = @Content),
             @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content)
     })
-    public ResponseEntity<?> updateAppUserPartially(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
+    public ResponseEntity<?> updateAppUserPartially(
+            @Parameter(description = "ID do usuário a ser atualizado", required = true)
+            @PathVariable Long id,
+            @Parameter(description = "Campos a serem atualizados", required = true)
+            @RequestBody Map<String, Object> updates) {
         AppUser existingAppUser = appUserService.getAppUserById(id);  // validando se existe
-        if (existingAppUser == null) throw new EntityNotFoundException("User não encontrado.");
+        if (existingAppUser == null) throw new EntityNotFoundException("Usuário não encontrado.");
 
         existingAppUser.setId(id);
         updates.forEach((key, value) -> {
@@ -214,12 +233,12 @@ public class AppUserController {
             }
         });
 
-        // validando se ele mandou algum campo errado
+        // validando se algum campo está incorreto
         Map<String, String> errors = ControllerUtils.verifyObject(existingAppUser, new ArrayList<>(updates.keySet()));
         if (!errors.isEmpty()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
 
         existingAppUser.setUpdatedAt(LocalDateTime.now());
         appUserService.saveAppUser(existingAppUser);
-        return ResponseEntity.status(HttpStatus.OK).body("User atualizado com sucesso.");
+        return ResponseEntity.status(HttpStatus.OK).body("Usuário atualizado com sucesso.");
     }
 }

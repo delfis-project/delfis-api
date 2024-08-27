@@ -41,8 +41,8 @@ public class AppUserThemeService {
     /**
      * @return appUserTheme pelo appUser.
      */
-    public List<AppUserTheme> getAppUserThemesByAppUser(AppUser appUser) {
-        List<AppUserTheme> appUserThemes = appUserThemeRepository.findAppUserThemesByAppUser(appUser);
+    public List<AppUserTheme> getAppUserThemesByAppUserId(Long id) {
+        List<AppUserTheme> appUserThemes = appUserThemeRepository.findAppUserThemesByAppUser_Id(id);
         return !appUserThemes.isEmpty() ? appUserThemes : null;
     }
 

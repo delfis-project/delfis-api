@@ -41,8 +41,8 @@ public class AppUserPowerupService {
     /**
      * @return appUserPowerup pelo appUser.
      */
-    public List<AppUserPowerup> getAppUserPowerupsByAppUser(AppUser appUser) {
-        List<AppUserPowerup> appUserPowerups = appUserPowerupRepository.findAppUserPowerupsByAppUser(appUser);
+    public List<AppUserPowerup> getAppUserPowerupsByAppUserId(Long id) {
+        List<AppUserPowerup> appUserPowerups = appUserPowerupRepository.findAppUserPowerupsByAppUser_Id(id);
         return !appUserPowerups.isEmpty() ? appUserPowerups : null;
     }
 

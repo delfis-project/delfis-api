@@ -51,16 +51,16 @@ public class AppUserService {
     /**
      * @return appUsers pelo plano.
      */
-    public List<AppUser> getAppUsersByPlan(Plan plan) {
-        List<AppUser> appUsers = appUserRepository.findAppUsersByPlanEquals(plan);
+    public List<AppUser> getAppUsersByPlanId(Long id) {
+        List<AppUser> appUsers = appUserRepository.findAppUsersByPlan_IdEquals(id);
         return appUsers.isEmpty() ? null : appUsers;
     }
 
     /**
      * @return appUsers pelo role.
      */
-    public List<AppUser> getAppUsersByUserRole(UserRole userRole) {
-        List<AppUser> appUsers = appUserRepository.findAppUsersByUserRoleEquals(userRole);
+    public List<AppUser> getAppUsersByUserRoleId(Long id) {
+        List<AppUser> appUsers = appUserRepository.findAppUsersByUserRole_IdEquals(id);
         return appUsers.isEmpty() ? null : appUsers;
     }
 

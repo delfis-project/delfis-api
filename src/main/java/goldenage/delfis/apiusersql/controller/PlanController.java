@@ -10,11 +10,11 @@ package goldenage.delfis.apiusersql.controller;
 import goldenage.delfis.apiusersql.model.Plan;
 import goldenage.delfis.apiusersql.service.PlanService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -29,7 +29,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/plan")
-@Tag(name = "Plan", description = "Endpoints para gerenciamento de planos")
 public class PlanController {
     private final PlanService planService;
 
@@ -56,7 +55,9 @@ public class PlanController {
             @ApiResponse(responseCode = "200", description = "Plano encontrado", content = @Content(schema = @Schema(implementation = Plan.class))),
             @ApiResponse(responseCode = "404", description = "Nenhum plano encontrado", content = @Content)
     })
-    public ResponseEntity<?> getPlanByName(@PathVariable String name) {
+    public ResponseEntity<?> getPlanByName(
+            @Parameter(description = "Nome do plano a ser buscado", required = true)
+            @PathVariable String name) {
         Plan plan = planService.getPlanByName(name.strip());
         if (plan != null) return ResponseEntity.status(HttpStatus.OK).body(plan);
 
@@ -69,9 +70,11 @@ public class PlanController {
             @ApiResponse(responseCode = "200", description = "Lista de planos encontrada", content = @Content(schema = @Schema(implementation = Plan.class))),
             @ApiResponse(responseCode = "404", description = "Nenhum plano encontrado", content = @Content)
     })
-    public ResponseEntity<?> getPlansByPriceIsLessThanEqual(@PathVariable BigDecimal value) {
+    public ResponseEntity<?> getPlansByPriceIsLessThanEqual(
+            @Parameter(description = "Valor máximo do preço", required = true)
+            @PathVariable BigDecimal value) {
         List<Plan> plans = planService.getPlansByPriceIsLessThanEqual(value);
-        if (plans != null) return ResponseEntity.status(HttpStatus.OK).body(plans);
+        if (plans != null && !plans.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(plans);
 
         throw new EntityNotFoundException("Nenhum plano encontrado.");
     }
@@ -82,9 +85,11 @@ public class PlanController {
             @ApiResponse(responseCode = "200", description = "Lista de planos encontrada", content = @Content(schema = @Schema(implementation = Plan.class))),
             @ApiResponse(responseCode = "404", description = "Nenhum plano encontrado", content = @Content)
     })
-    public ResponseEntity<?> getPlansByPriceIsGreaterThanEqual(@PathVariable BigDecimal value) {
+    public ResponseEntity<?> getPlansByPriceIsGreaterThanEqual(
+            @Parameter(description = "Valor mínimo do preço", required = true)
+            @PathVariable BigDecimal value) {
         List<Plan> plans = planService.getPlansByPriceIsGreaterThanEqual(value);
-        if (plans != null) return ResponseEntity.status(HttpStatus.OK).body(plans);
+        if (plans != null && !plans.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(plans);
 
         throw new EntityNotFoundException("Nenhum plano encontrado.");
     }
@@ -96,7 +101,9 @@ public class PlanController {
             @ApiResponse(responseCode = "409", description = "Conflito - Plano com o mesmo nome ou foto já existente", content = @Content),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> insertPlan(@Valid @RequestBody Plan plan) {
+    public ResponseEntity<?> insertPlan(
+            @Parameter(description = "Dados do novo plano", required = true)
+            @Valid @RequestBody Plan plan) {
         try {
             plan.setName(plan.getName().strip());
             Plan savedPlan = planService.savePlan(plan);
@@ -113,7 +120,9 @@ public class PlanController {
             @ApiResponse(responseCode = "404", description = "Plano não encontrado", content = @Content),
             @ApiResponse(responseCode = "409", description = "Conflito - Existem usuários cadastrados com esse plano", content = @Content)
     })
-    public ResponseEntity<String> deletePlan(@PathVariable Long id) {
+    public ResponseEntity<String> deletePlan(
+            @Parameter(description = "ID do plano a ser deletado", required = true)
+            @PathVariable Long id) {
         try {
             if (planService.deletePlanById(id) == null) throw new EntityNotFoundException("Plano não encontrado.");
             return ResponseEntity.status(HttpStatus.OK).body("Plano deletado com sucesso.");
@@ -129,7 +138,11 @@ public class PlanController {
             @ApiResponse(responseCode = "404", description = "Plano não encontrado", content = @Content),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> updatePlan(@PathVariable Long id, @Valid @RequestBody Plan plan) {
+    public ResponseEntity<?> updatePlan(
+            @Parameter(description = "ID do plano a ser atualizado", required = true)
+            @PathVariable Long id,
+            @Parameter(description = "Novos dados do plano", required = true)
+            @Valid @RequestBody Plan plan) {
         if (planService.getPlanById(id) == null) throw new EntityNotFoundException("Plano não encontrado.");
 
         plan.setId(id);
@@ -138,7 +151,6 @@ public class PlanController {
         return ResponseEntity.status(HttpStatus.OK).body(plan);
     }
 
-
     @PatchMapping("/update/{id}")
     @Operation(summary = "Atualizar parcialmente um plano", description = "Atualiza parcialmente um plano baseado no ID.")
     @ApiResponses(value = {
@@ -146,16 +158,25 @@ public class PlanController {
             @ApiResponse(responseCode = "404", description = "Plano não encontrado", content = @Content),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> updatePlanPartially(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
-        Plan existingPlan = planService.getPlanById(id);  // validando se existe
+    public ResponseEntity<?> updatePlanPartially(
+            @Parameter(description = "ID do plano a ser parcialmente atualizado", required = true)
+            @PathVariable Long id,
+            @Parameter(description = "Campos a serem atualizados", required = true)
+            @RequestBody Map<String, Object> updates) {
+        Plan existingPlan = planService.getPlanById(id);
         if (existingPlan == null) throw new EntityNotFoundException("Plano não encontrado.");
 
-        existingPlan.setId(id);
         updates.forEach((key, value) -> {
             try {
                 switch (key) {
                     case "name" -> existingPlan.setName(((String) value).strip());
-                    case "price" -> existingPlan.setPrice(BigDecimal.valueOf(Double.parseDouble((String) value)));
+                    case "price" -> {
+                        try {
+                            existingPlan.setPrice(BigDecimal.valueOf((Double) value));
+                        } catch (ClassCastException cce) {
+                            existingPlan.setPrice(BigDecimal.valueOf((Integer) value));
+                        }
+                    }
                     case "description" -> existingPlan.setDescription((String) value);
                     default -> throw new IllegalArgumentException("Campo " + key + " não é atualizável.");
                 }
@@ -164,7 +185,6 @@ public class PlanController {
             }
         });
 
-        // validando se ele mandou algum campo errado
         Map<String, String> errors = ControllerUtils.verifyObject(existingPlan, new ArrayList<>(updates.keySet()));
         if (!errors.isEmpty()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
 

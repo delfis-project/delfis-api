@@ -7,28 +7,25 @@
 
 package goldenage.delfis.apiusersql.controller;
 
-import goldenage.delfis.apiusersql.model.AppUser;
-import goldenage.delfis.apiusersql.model.Plan;
 import goldenage.delfis.apiusersql.model.PlanPayment;
 import goldenage.delfis.apiusersql.service.PlanPaymentService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/plan-payment")
-@Tag(name = "PlanPayment", description = "Endpoints para gerenciamento de pagamentos de planos")
 public class PlanPaymentController {
     private final PlanPaymentService planPaymentService;
 
@@ -49,30 +46,34 @@ public class PlanPaymentController {
         throw new EntityNotFoundException("Nenhum pagamento encontrado.");
     }
 
-    @GetMapping("/get-by-app-user")
+    @GetMapping("/get-by-app-user/{id}")
     @Operation(summary = "Obter pagamentos por usuário", description = "Retorna uma lista de pagamentos de planos associados ao usuário fornecido.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de pagamentos encontrada", content = @Content(schema = @Schema(implementation = PlanPayment.class))),
             @ApiResponse(responseCode = "404", description = "Nenhum pagamento encontrado", content = @Content)
     })
-    public ResponseEntity<?> getPlanPaymentsByAppUser(@RequestBody AppUser appUser) {
-        List<PlanPayment> planPayments = planPaymentService.getPlanPaymentsByAppUser(appUser);
-        if (planPayments != null) return ResponseEntity.status(HttpStatus.OK).body(planPayments);
+    public ResponseEntity<?> getPlanPaymentsByAppUserId(
+            @Parameter(description = "ID do usuário para buscar pagamentos", required = true)
+            @PathVariable Long id) {
+        List<PlanPayment> planPayments = planPaymentService.getPlanPaymentsByAppUserId(id);
+        if (planPayments != null && !planPayments.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(planPayments);
 
-        throw new EntityNotFoundException("Nenhum pagamento encontrado.");
+        throw new EntityNotFoundException("Nenhum pagamento encontrado para o usuário.");
     }
 
-    @GetMapping("/get-by-plan")
+    @GetMapping("/get-by-plan/{id}")
     @Operation(summary = "Obter pagamentos por plano", description = "Retorna uma lista de pagamentos de planos associados ao plano fornecido.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de pagamentos encontrada", content = @Content(schema = @Schema(implementation = PlanPayment.class))),
             @ApiResponse(responseCode = "404", description = "Nenhum pagamento encontrado", content = @Content)
     })
-    public ResponseEntity<?> getPlanPaymentsByPlan(@RequestBody Plan plan) {
-        List<PlanPayment> planPayments = planPaymentService.getPlanPaymentByPlan(plan);
-        if (planPayments != null) return ResponseEntity.status(HttpStatus.OK).body(planPayments);
+    public ResponseEntity<?> getPlanPaymentsByPlanId(
+            @Parameter(description = "ID do plano para buscar pagamentos", required = true)
+            @PathVariable Long id) {
+        List<PlanPayment> planPayments = planPaymentService.getPlanPaymentByPlanId(id);
+        if (planPayments != null && !planPayments.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(planPayments);
 
-        throw new EntityNotFoundException("Nenhum pagamento encontrado.");
+        throw new EntityNotFoundException("Nenhum pagamento encontrado para o plano.");
     }
 
     @PostMapping("/insert")
@@ -82,7 +83,9 @@ public class PlanPaymentController {
             @ApiResponse(responseCode = "409", description = "Conflito - Pagamento já existente", content = @Content),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> insertPlanPayment(@Valid @RequestBody PlanPayment planPayment) {
+    public ResponseEntity<?> insertPlanPayment(
+            @Parameter(description = "Dados do novo pagamento de plano", required = true)
+            @Valid @RequestBody PlanPayment planPayment) {
         try {
             PlanPayment savedPlanPayment = planPaymentService.savePlanPayment(planPayment);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedPlanPayment);
@@ -98,7 +101,9 @@ public class PlanPaymentController {
             @ApiResponse(responseCode = "404", description = "Pagamento não encontrado", content = @Content),
             @ApiResponse(responseCode = "409", description = "Conflito - Existem planos cadastrados com esse pagamento", content = @Content)
     })
-    public ResponseEntity<String> deletePlanPayment(@PathVariable Long id) {
+    public ResponseEntity<String> deletePlanPayment(
+            @Parameter(description = "ID do pagamento a ser deletado", required = true)
+            @PathVariable Long id) {
         try {
             if (planPaymentService.deletePlanPaymentById(id) == null) throw new EntityNotFoundException("Pagamento não encontrado.");
             return ResponseEntity.status(HttpStatus.OK).body("Pagamento deletado com sucesso.");
@@ -114,7 +119,11 @@ public class PlanPaymentController {
             @ApiResponse(responseCode = "404", description = "Pagamento não encontrado", content = @Content),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> updatePlanPayment(@PathVariable Long id, @Valid @RequestBody PlanPayment planPayment) {
+    public ResponseEntity<?> updatePlanPayment(
+            @Parameter(description = "ID do pagamento a ser atualizado", required = true)
+            @PathVariable Long id,
+            @Parameter(description = "Novos dados do pagamento de plano", required = true)
+            @Valid @RequestBody PlanPayment planPayment) {
         if (planPaymentService.getPlanPaymentById(id) == null) throw new EntityNotFoundException("Pagamento não encontrado.");
 
         planPayment.setId(id);
