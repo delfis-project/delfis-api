@@ -56,7 +56,7 @@ public class PlanPaymentController {
             @Parameter(description = "ID do usuário para buscar pagamentos", required = true)
             @PathVariable Long id) {
         List<PlanPayment> planPayments = planPaymentService.getPlanPaymentsByAppUserId(id);
-        if (planPayments != null && !planPayments.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(planPayments);
+        if (planPayments != null) return ResponseEntity.status(HttpStatus.OK).body(planPayments);
 
         throw new EntityNotFoundException("Nenhum pagamento encontrado para o usuário.");
     }
@@ -71,7 +71,7 @@ public class PlanPaymentController {
             @Parameter(description = "ID do plano para buscar pagamentos", required = true)
             @PathVariable Long id) {
         List<PlanPayment> planPayments = planPaymentService.getPlanPaymentByPlanId(id);
-        if (planPayments != null && !planPayments.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(planPayments);
+        if (planPayments != null) return ResponseEntity.status(HttpStatus.OK).body(planPayments);
 
         throw new EntityNotFoundException("Nenhum pagamento encontrado para o plano.");
     }

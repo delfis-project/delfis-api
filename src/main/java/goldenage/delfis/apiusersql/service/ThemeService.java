@@ -7,6 +7,7 @@
 
 package goldenage.delfis.apiusersql.service;
 
+import goldenage.delfis.apiusersql.model.Streak;
 import goldenage.delfis.apiusersql.model.Theme;
 import goldenage.delfis.apiusersql.repository.ThemeRepository;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,8 @@ public class ThemeService {
      * @return todos os themes do banco.
      */
     public List<Theme> getThemes() {
-        return themeRepository.findAll();
+        List<Theme> themes = themeRepository.findAll();
+        return themes.isEmpty() ? null : themes;
     }
 
     /**

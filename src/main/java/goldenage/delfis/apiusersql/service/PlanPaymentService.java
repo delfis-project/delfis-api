@@ -8,6 +8,7 @@
 package goldenage.delfis.apiusersql.service;
 
 import goldenage.delfis.apiusersql.model.AppUser;
+import goldenage.delfis.apiusersql.model.AppUserTheme;
 import goldenage.delfis.apiusersql.model.Plan;
 import goldenage.delfis.apiusersql.model.PlanPayment;
 import goldenage.delfis.apiusersql.repository.PlanPaymentRepository;
@@ -28,7 +29,8 @@ public class PlanPaymentService {
      * @return todos os planPayments do banco.
      */
     public List<PlanPayment> getPlanPayments() {
-        return planPaymentRepository.findAll();
+        List<PlanPayment> planPayments = planPaymentRepository.findAll();
+        return planPayments.isEmpty() ? null : planPayments;
     }
 
     /**

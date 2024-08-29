@@ -41,7 +41,7 @@ public class AppUserPowerupController {
     })
     public ResponseEntity<?> getAppUserPowerups() {
         List<AppUserPowerup> appUserPowerups = appUserPowerupService.getAppUserPowerups();
-        if (!appUserPowerups.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(appUserPowerups);
+        if (appUserPowerups != null) return ResponseEntity.status(HttpStatus.OK).body(appUserPowerups);
 
         throw new EntityNotFoundException("Nenhum powerup encontrado.");
     }
@@ -57,7 +57,7 @@ public class AppUserPowerupController {
             @Parameter(description = "ID do usuário para buscar powerups", required = true)
             @PathVariable Long id) {
         List<AppUserPowerup> appUserPowerups = appUserPowerupService.getAppUserPowerupsByAppUserId(id);
-        if (!appUserPowerups.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(appUserPowerups);
+        if (appUserPowerups != null) return ResponseEntity.status(HttpStatus.OK).body(appUserPowerups);
 
         throw new EntityNotFoundException("Nenhum powerup encontrado.");
     }

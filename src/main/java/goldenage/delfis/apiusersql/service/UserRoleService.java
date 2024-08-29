@@ -26,7 +26,8 @@ public class UserRoleService {
      * @return todos os userRoles do banco.
      */
     public List<UserRole> getUserRoles() {
-        return userRoleRepository.findAll();
+        List<UserRole> userRoles = userRoleRepository.findAll();
+        return userRoles.isEmpty() ? null : userRoles;
     }
 
     /**

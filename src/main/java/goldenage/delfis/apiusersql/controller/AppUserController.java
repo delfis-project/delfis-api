@@ -48,8 +48,8 @@ public class AppUserController {
             @ApiResponse(responseCode = "404", description = "Nenhum usuário encontrado", content = @Content)
     })
     public ResponseEntity<?> getAppUsers() {
-        List<AppUser> users = appUserService.getAppUsers();
-        if (!users.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(users);
+        List<AppUser> appUsers = appUserService.getAppUsers();
+        if (appUsers != null) return ResponseEntity.status(HttpStatus.OK).body(appUsers);
 
         throw new EntityNotFoundException("Nenhum usuário encontrado.");
     }
@@ -64,10 +64,10 @@ public class AppUserController {
     public ResponseEntity<?> getAppUserByUsername(
             @Parameter(description = "Nome de usuário do usuário", required = true)
             @PathVariable String username) {
-        AppUser user = appUserService.getAppUserByUsername(username);
-        if (user == null) throw new EntityNotFoundException("Nenhum usuário encontrado.");
+        AppUser appUser = appUserService.getAppUserByUsername(username);
+        if (appUser == null) throw new EntityNotFoundException("Nenhum usuário encontrado.");
 
-        return ResponseEntity.status(HttpStatus.OK).body(user);
+        return ResponseEntity.status(HttpStatus.OK).body(appUser);
     }
 
     @GetMapping("/get-by-email/{email}")
@@ -80,10 +80,10 @@ public class AppUserController {
     public ResponseEntity<?> getAppUserByEmail(
             @Parameter(description = "Email do usuário", required = true)
             @PathVariable String email) {
-        AppUser user = appUserService.getAppUserByEmail(email);
-        if (user == null) throw new EntityNotFoundException("Nenhum usuário encontrado.");
+        AppUser appUser = appUserService.getAppUserByEmail(email);
+        if (appUser == null) throw new EntityNotFoundException("Nenhum usuário encontrado.");
 
-        return ResponseEntity.status(HttpStatus.OK).body(user);
+        return ResponseEntity.status(HttpStatus.OK).body(appUser);
     }
 
     @GetMapping("/get-by-plan/{id}")
@@ -96,8 +96,8 @@ public class AppUserController {
     public ResponseEntity<?> getAppUsersByPlanId(
             @Parameter(description = "ID do plano", required = true)
             @PathVariable Long id) {
-        List<AppUser> users = appUserService.getAppUsersByPlanId(id);
-        if (!users.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(users);
+        List<AppUser> appUsers = appUserService.getAppUsersByPlanId(id);
+        if (appUsers != null) return ResponseEntity.status(HttpStatus.OK).body(appUsers);
 
         throw new EntityNotFoundException("Nenhum usuário encontrado.");
     }
@@ -112,8 +112,8 @@ public class AppUserController {
     public ResponseEntity<?> getAppUsersByUserRoleId(
             @Parameter(description = "ID da função do usuário", required = true)
             @PathVariable Long id) {
-        List<AppUser> users = appUserService.getAppUsersByUserRoleId(id);
-        if (!users.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(users);
+        List<AppUser> appUsers = appUserService.getAppUsersByUserRoleId(id);
+        if (appUsers != null) return ResponseEntity.status(HttpStatus.OK).body(appUsers);
 
         throw new EntityNotFoundException("Nenhum usuário encontrado.");
     }
@@ -126,8 +126,8 @@ public class AppUserController {
             @ApiResponse(responseCode = "400", description = "Erro na requisição", content = @Content)
     })
     public ResponseEntity<?> getLeaderboard() {
-        List<AppUser> users = appUserService.getLeaderboard();
-        if (!users.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(users);
+        List<AppUser> appUsers = appUserService.getLeaderboard();
+        if (appUsers != null) return ResponseEntity.status(HttpStatus.OK).body(appUsers);
 
         throw new EntityNotFoundException("Nenhum usuário encontrado.");
     }
@@ -143,8 +143,8 @@ public class AppUserController {
             @Parameter(description = "Dados do novo usuário", required = true)
             @Valid @RequestBody AppUser appUser) {
         try {
-            appUser.setName(appUser.getName().strip().toUpperCase());
-            appUser.setPassword(new BCryptPasswordEncoder().encode(appUser.getPassword()));
+            appUser.setCreatedAt(LocalDateTime.now());
+            appUser.setLevel(1);
             AppUser savedAppUser = appUserService.saveAppUser(appUser);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedAppUser);
         } catch (DataIntegrityViolationException dive) {
@@ -215,10 +215,8 @@ public class AppUserController {
                 switch (key) {
                     case "name" -> existingAppUser.setName(((String) value).strip().toUpperCase());
                     case "username" -> existingAppUser.setUsername((String) value);
-                    case "password" -> {
-                        String password = new BCryptPasswordEncoder().encode((String) value);
-                        existingAppUser.setPassword(password);
-                    }
+                    case "email" -> existingAppUser.setEmail((String) value);
+                    case "password" -> existingAppUser.setPassword((String) value);
                     case "level" -> existingAppUser.setLevel((Integer) value);
                     case "points" -> existingAppUser.setPoints((Integer) value);
                     case "coins" -> existingAppUser.setCoins((Integer) value);

@@ -44,7 +44,7 @@ public class ThemeController {
     })
     public ResponseEntity<List<Theme>> getThemes() {
         List<Theme> themes = themeService.getThemes();
-        if (!themes.isEmpty()) return ResponseEntity.ok(themes);
+        if (themes != null) return ResponseEntity.ok(themes);
 
         throw new EntityNotFoundException("Nenhum tema encontrado.");
     }

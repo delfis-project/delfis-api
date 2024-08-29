@@ -75,7 +75,6 @@ public class AppUser {
     @Schema(description = "Data de nascimento do usuário", example = "1990-05-15")
     private LocalDate birthDate;
 
-    @NotNull(message = "A foto não pode ser nula")
     @Size(min = 10, message = "A foto deve ter pelo menos 10 caracteres")
     @Schema(description = "Url da foto de perfil do usuário", example = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnGUKEObKP7a2L1helo1SZY1HLowd4ACTvqw&s")
     @Column(name = "picture_url")
@@ -93,7 +92,6 @@ public class AppUser {
     @NotNull(message = "O usuário deve ter um papel")
     private UserRole userRole;
 
-    @NotNull(message = "A data de criação da conta não pode ser nula")
     @Past(message = "A data de criação não pode ser futura")
     @Column(name = "created_at")
     @Schema(description = "Data e hora de criação da conta", example = "2024-08-15T14:30:00")
@@ -112,21 +110,11 @@ public class AppUser {
     @Schema(description = "Lista de pagamentos de plano do usuário", implementation = PlanPayment.class)
     private List<PlanPayment> payments;
 
-    @ManyToMany
-    @JoinTable(
-            name = "app_user_powerup",
-            joinColumns = @JoinColumn(name = "fk_app_user_id"),
-            inverseJoinColumns = @JoinColumn(name = "fk_powerup_id")
-    )
-    @Schema(description = "Lista de powerups do usuário", implementation = Powerup.class)
-    private List<Powerup> powerups;
+    @OneToMany(mappedBy = "fkAppUserId", cascade = CascadeType.ALL)
+    @Schema(description = "Lista de associações entre o usuário e seus powerups", implementation = AppUserPowerup.class)
+    private List<AppUserPowerup> appUserPowerups;
 
-    @ManyToMany
-    @JoinTable(
-            name = "app_user_theme",
-            joinColumns = @JoinColumn(name = "fk_app_user_id"),
-            inverseJoinColumns = @JoinColumn(name = "fk_theme_id")
-    )
-    @Schema(description = "Lista de temas do usuário", implementation = Theme.class)
-    private List<Theme> themes;
+    @OneToMany(mappedBy = "fkAppUserId", cascade = CascadeType.ALL)
+    @Schema(description = "Lista de temas do usuário", implementation = AppUserTheme.class)
+    private List<AppUserTheme> appUserThemes;
 }

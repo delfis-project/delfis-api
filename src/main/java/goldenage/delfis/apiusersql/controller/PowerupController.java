@@ -43,7 +43,7 @@ public class PowerupController {
     })
     public ResponseEntity<List<Powerup>> getPowerups() {
         List<Powerup> powerups = powerupService.getPowerups();
-        if (!powerups.isEmpty()) return ResponseEntity.ok(powerups);
+        if (powerups != null) return ResponseEntity.ok(powerups);
 
         throw new EntityNotFoundException("Nenhum powerup encontrado.");
     }

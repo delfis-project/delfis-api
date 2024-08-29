@@ -43,7 +43,7 @@ public class AppUserThemeController {
     })
     public ResponseEntity<?> getAppUserThemes() {
         List<AppUserTheme> appUserThemes = appUserThemeService.getAppUserThemes();
-        if (!appUserThemes.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(appUserThemes);
+        if (appUserThemes != null) return ResponseEntity.status(HttpStatus.OK).body(appUserThemes);
 
         throw new EntityNotFoundException("Nenhum tema encontrado.");
     }
@@ -59,7 +59,7 @@ public class AppUserThemeController {
             @Parameter(description = "ID do usuário para buscar temas", required = true)
             @PathVariable Long id) {
         List<AppUserTheme> appUserThemes = appUserThemeService.getAppUserThemesByAppUserId(id);
-        if (!appUserThemes.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(appUserThemes);
+        if (appUserThemes != null) return ResponseEntity.status(HttpStatus.OK).body(appUserThemes);
 
         throw new EntityNotFoundException("Nenhum tema encontrado.");
     }

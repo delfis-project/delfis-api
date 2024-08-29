@@ -8,6 +8,7 @@
 package goldenage.delfis.apiusersql.service;
 
 import goldenage.delfis.apiusersql.model.AppUser;
+import goldenage.delfis.apiusersql.model.AppUserPowerup;
 import goldenage.delfis.apiusersql.model.Plan;
 import goldenage.delfis.apiusersql.model.UserRole;
 import goldenage.delfis.apiusersql.repository.AppUserRepository;
@@ -29,7 +30,8 @@ public class AppUserService {
      * @return todos os appUsers do banco.
      */
     public List<AppUser> getAppUsers() {
-        return appUserRepository.findAll();
+        List<AppUser> appUsers = appUserRepository.findAll();
+        return appUsers.isEmpty() ? null : appUsers;
     }
 
     /**
@@ -93,6 +95,7 @@ public class AppUserService {
      * @return appUser inserido.
      */
     public AppUser saveAppUser(AppUser appUser) {
+        appUser.setName(appUser.getName().strip().toUpperCase());
         appUser.setPassword(new BCryptPasswordEncoder().encode(appUser.getPassword()));
         return appUserRepository.save(appUser);
     }

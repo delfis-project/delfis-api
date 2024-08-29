@@ -27,7 +27,8 @@ public class AppUserThemeService {
      * @return todos os appUserThemes do banco.
      */
     public List<AppUserTheme> getAppUserThemes() {
-        return appUserThemeRepository.findAll();
+        List<AppUserTheme> appUserThemes = appUserThemeRepository.findAll();
+        return appUserThemes.isEmpty() ? null : appUserThemes;
     }
 
     /**
@@ -42,7 +43,7 @@ public class AppUserThemeService {
      * @return appUserTheme pelo appUser.
      */
     public List<AppUserTheme> getAppUserThemesByAppUserId(Long id) {
-        List<AppUserTheme> appUserThemes = appUserThemeRepository.findAppUserThemesByAppUser_Id(id);
+        List<AppUserTheme> appUserThemes = appUserThemeRepository.findAppUserThemesByFkAppUserId(id);
         return !appUserThemes.isEmpty() ? appUserThemes : null;
     }
 

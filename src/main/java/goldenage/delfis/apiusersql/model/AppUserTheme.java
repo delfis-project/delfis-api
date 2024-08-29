@@ -49,11 +49,9 @@ public class AppUserTheme {
     @Column(name = "transaction_date")
     private LocalDate transactionDate;
 
-    @ManyToOne
-    @JoinColumn(name = "fk_app_user_id")
-    @Schema(description = "Usuário que comprou o tema", example = "{ \"id\": 1234, \"username\": \"jvdinizaraujo\" }")
+    @Column(name = "fk_app_user_id")
     @NotNull(message = "A transação deve ter um usuário")
-    private AppUser appUser;
+    private long fkAppUserId;
 
     @ManyToOne
     @JoinColumn(name = "fk_theme_id")

@@ -41,7 +41,7 @@ public class UserRoleController {
     })
     public ResponseEntity<List<UserRole>> getUserRoles() {
         List<UserRole> userRoles = userRoleService.getUserRoles();
-        if (!userRoles.isEmpty()) return ResponseEntity.ok(userRoles);
+        if (userRoles != null) return ResponseEntity.ok(userRoles);
 
         throw new EntityNotFoundException("Nenhuma role encontrada.");
     }

@@ -7,6 +7,7 @@
 
 package goldenage.delfis.apiusersql.service;
 
+import goldenage.delfis.apiusersql.model.Plan;
 import goldenage.delfis.apiusersql.model.Powerup;
 import goldenage.delfis.apiusersql.repository.PowerupRepository;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,8 @@ public class PowerupService {
      * @return todos os powerups do banco.
      */
     public List<Powerup> getPowerups() {
-        return powerupRepository.findAll();
+        List<Powerup> powerups = powerupRepository.findAll();
+        return powerups.isEmpty() ? null : powerups;
     }
 
     /**

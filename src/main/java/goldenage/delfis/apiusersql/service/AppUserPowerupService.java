@@ -27,7 +27,8 @@ public class AppUserPowerupService {
      * @return todos os appUserPowerups do banco.
      */
     public List<AppUserPowerup> getAppUserPowerups() {
-        return appUserPowerupRepository.findAll();
+        List<AppUserPowerup> appUserPowerups = appUserPowerupRepository.findAll();
+        return appUserPowerups.isEmpty() ? null : appUserPowerups;
     }
 
     /**
@@ -42,7 +43,7 @@ public class AppUserPowerupService {
      * @return appUserPowerup pelo appUser.
      */
     public List<AppUserPowerup> getAppUserPowerupsByAppUserId(Long id) {
-        List<AppUserPowerup> appUserPowerups = appUserPowerupRepository.findAppUserPowerupsByAppUser_Id(id);
+        List<AppUserPowerup> appUserPowerups = appUserPowerupRepository.findAppUserPowerupsByFkAppUserId(id);
         return !appUserPowerups.isEmpty() ? appUserPowerups : null;
     }
 

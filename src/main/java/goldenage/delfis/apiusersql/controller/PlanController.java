@@ -44,7 +44,7 @@ public class PlanController {
     })
     public ResponseEntity<?> getPlans() {
         List<Plan> plans = planService.getPlans();
-        if (!plans.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(plans);
+        if (plans != null) return ResponseEntity.status(HttpStatus.OK).body(plans);
 
         throw new EntityNotFoundException("Nenhum plano encontrado.");
     }
@@ -74,7 +74,7 @@ public class PlanController {
             @Parameter(description = "Valor máximo do preço", required = true)
             @PathVariable BigDecimal value) {
         List<Plan> plans = planService.getPlansByPriceIsLessThanEqual(value);
-        if (plans != null && !plans.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(plans);
+        if (plans != null) return ResponseEntity.status(HttpStatus.OK).body(plans);
 
         throw new EntityNotFoundException("Nenhum plano encontrado.");
     }
@@ -89,7 +89,7 @@ public class PlanController {
             @Parameter(description = "Valor mínimo do preço", required = true)
             @PathVariable BigDecimal value) {
         List<Plan> plans = planService.getPlansByPriceIsGreaterThanEqual(value);
-        if (plans != null && !plans.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(plans);
+        if (plans != null) return ResponseEntity.status(HttpStatus.OK).body(plans);
 
         throw new EntityNotFoundException("Nenhum plano encontrado.");
     }

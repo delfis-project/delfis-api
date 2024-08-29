@@ -44,7 +44,7 @@ public class StreakController {
     })
     public ResponseEntity<List<Streak>> getStreaks() {
         List<Streak> streaks = streakService.getStreaks();
-        if (!streaks.isEmpty()) return ResponseEntity.ok(streaks);
+        if (streaks != null) return ResponseEntity.ok(streaks);
 
         throw new EntityNotFoundException("Nenhum streak encontrado.");
     }
@@ -59,7 +59,7 @@ public class StreakController {
             @Parameter(description = "Data inicial para filtragem dos streaks", required = true)
             @RequestBody LocalDate initialDate) {
         List<Streak> streaks = streakService.getStreaksByInitialDateBefore(initialDate);
-        if (!streaks.isEmpty()) return ResponseEntity.ok(streaks);
+        if (streaks != null) return ResponseEntity.ok(streaks);
 
         throw new EntityNotFoundException("Nenhum streak encontrado com a data inicial fornecida.");
     }
@@ -74,7 +74,7 @@ public class StreakController {
             @Parameter(description = "ID do usuário para filtragem dos streaks", required = true)
             @PathVariable Long id) {
         List<Streak> streaks = streakService.getStreaksByAppUserId(id);
-        if (!streaks.isEmpty()) return ResponseEntity.ok(streaks);
+        if (streaks != null) return ResponseEntity.ok(streaks);
 
         throw new EntityNotFoundException("Nenhum streak encontrado para o usuário fornecido.");
     }
@@ -93,7 +93,7 @@ public class StreakController {
             Streak savedStreak = streakService.saveStreak(streak);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedStreak);
         } catch (DataIntegrityViolationException dive) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Streak já existente.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("AppUser não existe.");
         }
     }
 
