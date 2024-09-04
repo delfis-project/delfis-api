@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -24,7 +23,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
-@Entity(name = "app_user_powerup")
+@Entity
+@Table(name = "app_user_powerup")
 @Schema(description = "Itens dos powerups com seus respectivos usuários.")
 public class AppUserPowerup {
     @Id
@@ -39,18 +39,17 @@ public class AppUserPowerup {
     private int transactionPrice;
 
     @NotNull(message = "A data da transação não pode ser nula")
-    @Past(message = "Data da transação não pode ser futura")
     @Schema(description = "Data da transação de compra do powerup", example = "2024-05-20")
     @Column(name = "transaction_date")
     private LocalDate transactionDate;
 
     @Column(name = "fk_app_user_id")
+    @Schema(description = "Usuário", example = "2")
     @NotNull(message = "A transação deve ter um usuário")
     private long fkAppUserId;
 
-    @ManyToOne
-    @JoinColumn(name = "fk_powerup_id")
-    @Schema(description = "Powerup que foi comprado", example = "{ \"id\": 5678, \"name\": \"Dobro de Pontos\" }")
+    @Column(name = "fk_powerup_id")
+    @Schema(description = "Powerup que foi comprado", example = "2")
     @NotNull(message = "A transação deve ter um powerup")
-    private Powerup powerup;
+    private long fkPowerupId;
 }

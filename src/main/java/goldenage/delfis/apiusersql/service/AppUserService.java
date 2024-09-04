@@ -8,9 +8,6 @@
 package goldenage.delfis.apiusersql.service;
 
 import goldenage.delfis.apiusersql.model.AppUser;
-import goldenage.delfis.apiusersql.model.AppUserPowerup;
-import goldenage.delfis.apiusersql.model.Plan;
-import goldenage.delfis.apiusersql.model.UserRole;
 import goldenage.delfis.apiusersql.repository.AppUserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -54,7 +51,7 @@ public class AppUserService {
      * @return appUsers pelo plano.
      */
     public List<AppUser> getAppUsersByPlanId(Long id) {
-        List<AppUser> appUsers = appUserRepository.findAppUsersByPlan_IdEquals(id);
+        List<AppUser> appUsers = appUserRepository.findAppUsersByFkPlanIdEquals(id);
         return appUsers.isEmpty() ? null : appUsers;
     }
 
@@ -62,7 +59,7 @@ public class AppUserService {
      * @return appUsers pelo role.
      */
     public List<AppUser> getAppUsersByUserRoleId(Long id) {
-        List<AppUser> appUsers = appUserRepository.findAppUsersByUserRole_IdEquals(id);
+        List<AppUser> appUsers = appUserRepository.findAppUsersByFkUserRoleIdEquals(id);
         return appUsers.isEmpty() ? null : appUsers;
     }
 

@@ -38,7 +38,7 @@ public class PlanPaymentService {
      */
     public List<PlanPayment> getPlanPaymentsByAppUserId(Long id) {
         List<PlanPayment> planPayment = planPaymentRepository
-                .findPlanPaymentsByAppUser_IdOrderByExpirationTimestamp(id);
+                .findPlanPaymentsByFkAppUserIdOrderByExpirationTimestamp(id);
         return planPayment.isEmpty() ? null : planPayment;
     }
 
@@ -46,7 +46,7 @@ public class PlanPaymentService {
      * @return planPayment pelo plano.
      */
     public List<PlanPayment> getPlanPaymentByPlanId(Long id) {
-        List<PlanPayment> planPayment = planPaymentRepository.findPlanPaymentsByPlan_Id(id);
+        List<PlanPayment> planPayment = planPaymentRepository.findPlanPaymentsByFkPlanId(id);
         return planPayment.isEmpty() ? null : planPayment;
     }
 

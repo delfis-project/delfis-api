@@ -15,6 +15,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface PlanPaymentRepository extends JpaRepository<PlanPayment, Long> {
-    List<PlanPayment> findPlanPaymentsByAppUser_IdOrderByExpirationTimestamp(Long id);
-    List<PlanPayment> findPlanPaymentsByPlan_Id(Long id);
+    List<PlanPayment> findPlanPaymentsByFkAppUserIdOrderByExpirationTimestamp(Long id);
+    List<PlanPayment> findPlanPaymentsByFkPlanId(Long id);
 }
