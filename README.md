@@ -1,9 +1,11 @@
 # api-user-sql
 API utilizando a arquitetura MVC (sem views e com services) para manipulação do banco SQL. A aplicação foi desenvolvida para suportar o backend do aplicativo "Delfis!".
 <br/>
-Database original: https://github.com/delfis-project/db-sql
+Aplicativo: https://github.com/delfis-project/delfis-app
 <br/>
-Atualmente hospedado no Render: https://api-user-sql.onrender.com
+Database: https://github.com/delfis-project/db-sql
+<br/>
+Serviço hospedado no Render: https://api-user-sql.onrender.com
 
 ## Tecnologias utilizadas
 - Spring Boot: Framework principal para o desenvolvimento da API.
