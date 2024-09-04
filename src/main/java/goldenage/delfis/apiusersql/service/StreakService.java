@@ -8,6 +8,7 @@
 package goldenage.delfis.apiusersql.service;
 
 import goldenage.delfis.apiusersql.model.AppUser;
+import goldenage.delfis.apiusersql.model.Powerup;
 import goldenage.delfis.apiusersql.model.Streak;
 import goldenage.delfis.apiusersql.repository.StreakRepository;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,8 @@ public class StreakService {
      * @return todos os streaks do banco.
      */
     public List<Streak> getStreaks() {
-        return streakRepository.findAll();
+        List<Streak> streaks = streakRepository.findAll();
+        return streaks.isEmpty() ? null : streaks;
     }
 
     /**
@@ -50,8 +52,8 @@ public class StreakService {
     /**
      * @return streak pelo usuário.
      */
-    public List<Streak> getStreaksByAppUser(AppUser appUser) {
-        List<Streak> streaks = streakRepository.findStreaksByAppUserEquals(appUser);
+    public List<Streak> getStreaksByAppUserId(Long id) {
+        List<Streak> streaks = streakRepository.findStreaksByFkAppUserId(id);
         return !streaks.isEmpty() ? streaks : null;
     }
 

@@ -8,6 +8,7 @@
 package goldenage.delfis.apiusersql.service;
 
 import goldenage.delfis.apiusersql.model.Plan;
+import goldenage.delfis.apiusersql.model.PlanPayment;
 import goldenage.delfis.apiusersql.repository.PlanRepository;
 import org.springframework.stereotype.Service;
 
@@ -51,7 +52,8 @@ public class PlanService {
      * @return todos os planos do banco.
      */
     public List<Plan> getPlans() {
-        return planRepository.findAll();
+        List<Plan> plans = planRepository.findAll();
+        return plans.isEmpty() ? null : plans;
     }
 
     /**

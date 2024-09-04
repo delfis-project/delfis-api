@@ -8,10 +8,7 @@
 package goldenage.delfis.apiusersql.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -34,5 +31,6 @@ public class UserRole {
     @NotNull(message = "O nome do papel não pode ser nulo")
     @Size(min = 2, max = 20, message = "O nome do papel deve ter pelo menos 2 caracteres e no máximo 20")
     @Schema(description = "Nome do papel de usuário", example = "Administrador")
+    @Column(unique = true)
     private String name;
 }

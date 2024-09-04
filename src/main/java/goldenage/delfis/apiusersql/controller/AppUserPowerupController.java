@@ -3,19 +3,21 @@
  * Controller da entidade AppUserPowerup
  * Autor: João Diniz Araujo
  * Data: 19/08/2024
- * */
+ */
 
 package goldenage.delfis.apiusersql.controller;
 
-import goldenage.delfis.apiusersql.model.AppUser;
-import goldenage.delfis.apiusersql.model.AppUserPowerup;
+import goldenage.delfis.apiusersql.model.*;
 import goldenage.delfis.apiusersql.service.AppUserPowerupService;
+import goldenage.delfis.apiusersql.service.AppUserService;
+import goldenage.delfis.apiusersql.service.PowerupService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -27,38 +29,45 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/app-user-powerup")
-@Tag(name = "AppUserPowerup", description = "Endpoints para gerenciamento de powerups de usuários")
 public class AppUserPowerupController {
     private final AppUserPowerupService appUserPowerupService;
+    private final AppUserService appUserService;
+    private final PowerupService powerupService;
 
-    public AppUserPowerupController(AppUserPowerupService appUserPowerupService) {
+    public AppUserPowerupController(AppUserPowerupService appUserPowerupService, AppUserService appUserService, PowerupService powerupService) {
         this.appUserPowerupService = appUserPowerupService;
+        this.powerupService = powerupService;
+        this.appUserService = appUserService;
     }
 
     @GetMapping("/get-all")
     @Operation(summary = "Obter todos os powerups de usuários", description = "Retorna uma lista de todos os powerups de usuários registrados.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de powerups encontrada", content = @Content(schema = @Schema(implementation = AppUserPowerup.class))),
+            @ApiResponse(responseCode = "200", description = "Lista de powerups encontrada", content = @Content(array = @ArraySchema(schema = @Schema(implementation = AppUserPowerup.class)))),
             @ApiResponse(responseCode = "404", description = "Nenhum powerup encontrado", content = @Content)
     })
     public ResponseEntity<?> getAppUserPowerups() {
         List<AppUserPowerup> appUserPowerups = appUserPowerupService.getAppUserPowerups();
-        if (!appUserPowerups.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(appUserPowerups);
-
+        if (appUserPowerups != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(appUserPowerups);
+        }
         throw new EntityNotFoundException("Nenhum powerup encontrado.");
     }
 
-    @GetMapping("/get-by-app-user")
+    @GetMapping("/get-by-app-user/{id}")
     @Operation(summary = "Obter powerups por usuário", description = "Retorna uma lista de powerups baseados no usuário.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de powerups encontrada", content = @Content(schema = @Schema(implementation = AppUserPowerup.class))),
+            @ApiResponse(responseCode = "200", description = "Lista de powerups encontrada", content = @Content(array = @ArraySchema(schema = @Schema(implementation = AppUserPowerup.class)))),
             @ApiResponse(responseCode = "404", description = "Nenhum powerup encontrado", content = @Content),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
+            @ApiResponse(responseCode = "400", description = "ID do usuário inválido", content = @Content)
     })
-    public ResponseEntity<?> getAppUserPowerupsByAppUser(@RequestBody AppUser appUser) {
-        List<AppUserPowerup> appUserPowerups = appUserPowerupService.getAppUserPowerupsByAppUser(appUser);
-        if (!appUserPowerups.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(appUserPowerups);
-
+    public ResponseEntity<?> getAppUserPowerupsByAppUserId(
+            @Parameter(description = "ID do usuário para buscar powerups", required = true)
+            @PathVariable Long id) {
+        List<AppUserPowerup> appUserPowerups = appUserPowerupService.getAppUserPowerupsByAppUserId(id);
+        if (appUserPowerups != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(appUserPowerups);
+        }
         throw new EntityNotFoundException("Nenhum powerup encontrado.");
     }
 
@@ -68,9 +77,16 @@ public class AppUserPowerupController {
             @ApiResponse(responseCode = "201", description = "Powerup criado com sucesso", content = @Content(schema = @Schema(implementation = AppUserPowerup.class))),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> insertAppUserPowerup(@Valid @RequestBody AppUserPowerup appUserPowerup) {
-        AppUserPowerup savedAppUserPowerup = appUserPowerupService.saveAppUserPowerup(appUserPowerup);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedAppUserPowerup);
+    public ResponseEntity<?> insertAppUserPowerup(
+            @Parameter(description = "Dados do novo powerup de usuário", required = true)
+            @Valid @RequestBody AppUserPowerup appUserPowerup) {
+        try {
+            verifyFks(appUserPowerup);
+            appUserPowerup = appUserPowerupService.saveAppUserPowerup(appUserPowerup);
+            return ResponseEntity.status(HttpStatus.CREATED).body(appUserPowerup);
+        } catch (DataIntegrityViolationException dive) {
+            throw new DataIntegrityViolationException("Dados inválidos: " + dive.getMessage());
+        }
     }
 
     @DeleteMapping("/delete/{id}")
@@ -80,9 +96,13 @@ public class AppUserPowerupController {
             @ApiResponse(responseCode = "404", description = "Powerup não encontrado", content = @Content),
             @ApiResponse(responseCode = "409", description = "Conflito - Existem usuários cadastrados com esse powerup", content = @Content)
     })
-    public ResponseEntity<String> deleteAppUserPowerup(@PathVariable Long id) {
+    public ResponseEntity<String> deleteAppUserPowerup(
+            @Parameter(description = "ID do powerup a ser deletado", required = true)
+            @PathVariable Long id) {
         try {
-            if (appUserPowerupService.deleteAppUserPowerupById(id) == null) throw new EntityNotFoundException("Powerup não encontrado.");
+            if (appUserPowerupService.deleteAppUserPowerupById(id) == null) {
+                throw new EntityNotFoundException("Powerup não encontrado.");
+            }
             return ResponseEntity.status(HttpStatus.OK).body("Powerup deletado com sucesso.");
         } catch (DataIntegrityViolationException dive) {
             throw new DataIntegrityViolationException("Existem usuários cadastrados com esse powerup. Mude-os para excluir esse powerup.");
@@ -96,10 +116,32 @@ public class AppUserPowerupController {
             @ApiResponse(responseCode = "404", description = "Powerup não encontrado", content = @Content),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> updateAppUserPowerup(@PathVariable Long id, @Valid @RequestBody AppUserPowerup appUserPowerup) {
-        if (appUserPowerupService.getAppUserPowerupById(id) == null) throw new EntityNotFoundException("Powerup não encontrado.");
+    public ResponseEntity<?> updateAppUserPowerup(
+            @Parameter(description = "ID do powerup a ser atualizado", required = true)
+            @PathVariable Long id,
+            @Parameter(description = "Novos dados do powerup de usuário", required = true)
+            @Valid @RequestBody AppUserPowerup appUserPowerup) {
+        if (appUserPowerupService.getAppUserPowerupById(id) == null) {
+            throw new EntityNotFoundException("Powerup não encontrado.");
+        }
 
-        appUserPowerupService.saveAppUserPowerup(appUserPowerup);
-        return ResponseEntity.status(HttpStatus.OK).body(appUserPowerup);
+        verifyFks(appUserPowerup);
+        appUserPowerup.setId(id);
+        try {
+            appUserPowerup = appUserPowerupService.saveAppUserPowerup(appUserPowerup);
+            return ResponseEntity.status(HttpStatus.OK).body(appUserPowerup);
+        } catch (DataIntegrityViolationException dive) {
+            throw new DataIntegrityViolationException("Dados inválidos: " + dive.getMessage());
+        }
+    }
+
+    private void verifyFks(AppUserPowerup appUserPowerup) {
+        Powerup powerup = powerupService.getPowerupById((appUserPowerup.getFkPowerupId()));
+        if (powerup == null) throw new EntityNotFoundException("Tema não encontrado.");
+        appUserPowerup.setFkPowerupId(powerup.getId());
+
+        AppUser appUser = appUserService.getAppUserById(appUserPowerup.getFkAppUserId());
+        if (appUser == null) throw new ClassCastException("Usuário não encontrado.");
+        appUserPowerup.setFkAppUserId(appUser.getId());
     }
 }

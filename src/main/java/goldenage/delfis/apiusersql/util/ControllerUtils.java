@@ -5,13 +5,14 @@
  * Data: 15/08/2024
  * */
 
-package goldenage.delfis.apiusersql.controller;
+package goldenage.delfis.apiusersql.util;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 
+import javax.xml.crypto.Data;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

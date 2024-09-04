@@ -10,7 +10,6 @@ package goldenage.delfis.apiusersql.model;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -32,18 +31,15 @@ public class Streak {
 
     @Column(name = "initial_date")
     @NotNull(message = "A data de início não pode ser nula")
-    @Past(message = "A data de início não pode ser futura")
     @Schema(description = "Data de início do streak", example = "2024-08-01")
     private LocalDate initialDate;
 
     @Column(name = "final_date")
-    @Past(message = "A data de fim não pode ser futura")
     @Schema(description = "Data de fim do streak", example = "2024-08-15")
     private LocalDate finalDate;
 
-    @ManyToOne
-    @JoinColumn(name = "fk_app_user_id")
+    @Column(name = "fk_app_user_id")
     @NotNull(message = "O streak deve ter um usuário associado")
-    @Schema(description = "Usuário associado ao streak", example = "jvdinizaraujo")
-    private AppUser appUser;
+    @Schema(description = "Usuário que realizou o streak", example = "jvdinizaraujo")
+    private long fkAppUserId;
 }

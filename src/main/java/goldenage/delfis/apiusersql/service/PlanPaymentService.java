@@ -8,6 +8,7 @@
 package goldenage.delfis.apiusersql.service;
 
 import goldenage.delfis.apiusersql.model.AppUser;
+import goldenage.delfis.apiusersql.model.AppUserTheme;
 import goldenage.delfis.apiusersql.model.Plan;
 import goldenage.delfis.apiusersql.model.PlanPayment;
 import goldenage.delfis.apiusersql.repository.PlanPaymentRepository;
@@ -28,23 +29,24 @@ public class PlanPaymentService {
      * @return todos os planPayments do banco.
      */
     public List<PlanPayment> getPlanPayments() {
-        return planPaymentRepository.findAll();
+        List<PlanPayment> planPayments = planPaymentRepository.findAll();
+        return planPayments.isEmpty() ? null : planPayments;
     }
 
     /**
      * @return planPayment pelo usuário.
      */
-    public List<PlanPayment> getPlanPaymentsByAppUser(AppUser appUser) {
+    public List<PlanPayment> getPlanPaymentsByAppUserId(Long id) {
         List<PlanPayment> planPayment = planPaymentRepository
-                .findPlanPaymentsByAppUserOrderByExpirationTimestamp(appUser);
+                .findPlanPaymentsByFkAppUserIdOrderByExpirationTimestamp(id);
         return planPayment.isEmpty() ? null : planPayment;
     }
 
     /**
      * @return planPayment pelo plano.
      */
-    public List<PlanPayment> getPlanPaymentByPlan(Plan plan) {
-        List<PlanPayment> planPayment = planPaymentRepository.findPlanPaymentsByPlan(plan);
+    public List<PlanPayment> getPlanPaymentByPlanId(Long id) {
+        List<PlanPayment> planPayment = planPaymentRepository.findPlanPaymentsByFkPlanId(id);
         return planPayment.isEmpty() ? null : planPayment;
     }
 

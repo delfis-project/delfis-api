@@ -46,15 +46,13 @@ public class PlanPayment {
     @Column(name = "expiration_timestamp")
     private LocalDateTime expirationTimestamp;
 
-    @ManyToOne
-    @NotNull(message = "O pagamento precisa ter um plano associado")
-    @JoinColumn(name = "fk_plan_id")
-    @Schema(description = "Plano associado ao pagamento", example = "Premium")
-    private Plan plan;
+    @Column(name = "fk_plan_id")
+    @NotNull(message = "O pagamento deve ter um plano")
+    @Schema(description = "Plano que foi comprado", example = "1")
+    private long fkPlanId;
 
-    @ManyToOne
-    @JoinColumn(name = "fk_app_user_id")
+    @Column(name = "fk_app_user_id")
     @NotNull(message = "O pagamento deve ter um usuário associado")
-    @Schema(description = "Usuário que realizou o pagamento", example = "jvdinizaraujo")
-    private AppUser appUser;
+    @Schema(description = "Usuário que realizou o pagamento", example = "1")
+    private long fkAppUserId;
 }

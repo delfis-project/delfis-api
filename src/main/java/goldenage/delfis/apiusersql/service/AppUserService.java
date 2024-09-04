@@ -8,8 +8,6 @@
 package goldenage.delfis.apiusersql.service;
 
 import goldenage.delfis.apiusersql.model.AppUser;
-import goldenage.delfis.apiusersql.model.Plan;
-import goldenage.delfis.apiusersql.model.UserRole;
 import goldenage.delfis.apiusersql.repository.AppUserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,7 +27,8 @@ public class AppUserService {
      * @return todos os appUsers do banco.
      */
     public List<AppUser> getAppUsers() {
-        return appUserRepository.findAll();
+        List<AppUser> appUsers = appUserRepository.findAll();
+        return appUsers.isEmpty() ? null : appUsers;
     }
 
     /**
@@ -51,16 +50,16 @@ public class AppUserService {
     /**
      * @return appUsers pelo plano.
      */
-    public List<AppUser> getAppUsersByPlan(Plan plan) {
-        List<AppUser> appUsers = appUserRepository.findAppUsersByPlanEquals(plan);
+    public List<AppUser> getAppUsersByPlanId(Long id) {
+        List<AppUser> appUsers = appUserRepository.findAppUsersByFkPlanIdEquals(id);
         return appUsers.isEmpty() ? null : appUsers;
     }
 
     /**
      * @return appUsers pelo role.
      */
-    public List<AppUser> getAppUsersByUserRole(UserRole userRole) {
-        List<AppUser> appUsers = appUserRepository.findAppUsersByUserRoleEquals(userRole);
+    public List<AppUser> getAppUsersByUserRoleId(Long id) {
+        List<AppUser> appUsers = appUserRepository.findAppUsersByFkUserRoleIdEquals(id);
         return appUsers.isEmpty() ? null : appUsers;
     }
 
@@ -93,6 +92,7 @@ public class AppUserService {
      * @return appUser inserido.
      */
     public AppUser saveAppUser(AppUser appUser) {
+        appUser.setName(appUser.getName().strip().toUpperCase());
         appUser.setPassword(new BCryptPasswordEncoder().encode(appUser.getPassword()));
         return appUserRepository.save(appUser);
     }

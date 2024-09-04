@@ -9,26 +9,27 @@ package goldenage.delfis.apiusersql.controller;
 
 import goldenage.delfis.apiusersql.model.Powerup;
 import goldenage.delfis.apiusersql.service.PowerupService;
+import goldenage.delfis.apiusersql.util.ControllerUtils;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/powerup")
-@Tag(name = "Powerup", description = "Endpoints para gerenciamento de powerups")
 public class PowerupController {
     private final PowerupService powerupService;
 
@@ -39,12 +40,12 @@ public class PowerupController {
     @GetMapping("/get-all")
     @Operation(summary = "Obter todos os powerups", description = "Retorna uma lista de todos os powerups registrados.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de powerups encontrada", content = @Content(schema = @Schema(implementation = Powerup.class))),
+            @ApiResponse(responseCode = "200", description = "Lista de powerups encontrada", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Powerup.class)))),
             @ApiResponse(responseCode = "404", description = "Nenhum powerup encontrado", content = @Content)
     })
-    public ResponseEntity<?> getPowerups() {
+    public ResponseEntity<List<Powerup>> getPowerups() {
         List<Powerup> powerups = powerupService.getPowerups();
-        if (!powerups.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(powerups);
+        if (powerups != null) return ResponseEntity.status(HttpStatus.OK).body(powerups);
 
         throw new EntityNotFoundException("Nenhum powerup encontrado.");
     }
@@ -55,11 +56,13 @@ public class PowerupController {
             @ApiResponse(responseCode = "200", description = "Powerup encontrado", content = @Content(schema = @Schema(implementation = Powerup.class))),
             @ApiResponse(responseCode = "404", description = "Nenhum powerup encontrado", content = @Content)
     })
-    public ResponseEntity<?> getPowerupByName(@PathVariable String name) {
+    public ResponseEntity<Powerup> getPowerupByName(
+            @Parameter(description = "Nome do powerup a ser buscado", required = true)
+            @PathVariable String name) {
         Powerup powerup = powerupService.getPowerupByName(name.strip());
         if (powerup != null) return ResponseEntity.status(HttpStatus.OK).body(powerup);
 
-        throw new EntityNotFoundException("Nenhum powerup encontrado.");
+        throw new EntityNotFoundException("Nenhum powerup encontrado com o nome fornecido.");
     }
 
     @PostMapping("/insert")
@@ -69,12 +72,15 @@ public class PowerupController {
             @ApiResponse(responseCode = "409", description = "Conflito - Powerup já existente", content = @Content),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> insertPowerup(@Valid @RequestBody Powerup powerup) {
+    public ResponseEntity<Powerup> insertPowerup(
+            @Parameter(description = "Dados do novo powerup", required = true)
+            @Valid @RequestBody Powerup powerup) {
         try {
-            Powerup savedPowerup = powerupService.savePowerup(powerup);
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedPowerup);
+            powerup.setName(powerup.getName().strip());
+            Powerup createdPowerup = powerupService.savePowerup(powerup);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdPowerup);
         } catch (DataIntegrityViolationException dive) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Powerup com esse nome ou foto já existente.");
+            throw new DataIntegrityViolationException("Powerup com esse nome ou foto já existente.");
         }
     }
 
@@ -85,9 +91,12 @@ public class PowerupController {
             @ApiResponse(responseCode = "404", description = "Powerup não encontrado", content = @Content),
             @ApiResponse(responseCode = "409", description = "Conflito - Existem usuários cadastrados com esse powerup", content = @Content)
     })
-    public ResponseEntity<String> deletePowerup(@PathVariable Long id) {
+    public ResponseEntity<String> deletePowerup(
+            @Parameter(description = "ID do powerup a ser deletado", required = true)
+            @PathVariable Long id) {
         try {
-            if (powerupService.deletePowerupById(id) == null) throw new EntityNotFoundException("Powerup não encontrado.");
+            if (powerupService.deletePowerupById(id) == null)
+                throw new EntityNotFoundException("Powerup não encontrado.");
             return ResponseEntity.status(HttpStatus.OK).body("Powerup deletado com sucesso.");
         } catch (DataIntegrityViolationException dive) {
             throw new DataIntegrityViolationException("Existem usuários cadastrados com esse powerup. Mude-os para excluir esse powerup.");
@@ -101,38 +110,41 @@ public class PowerupController {
             @ApiResponse(responseCode = "404", description = "Powerup não encontrado", content = @Content),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> updatePowerup(@PathVariable Long id, @Valid @RequestBody Powerup powerup) {
+    public ResponseEntity<Powerup> updatePowerup(
+            @Parameter(description = "ID do powerup a ser atualizado", required = true)
+            @PathVariable Long id,
+            @Parameter(description = "Novos dados do powerup", required = true)
+            @Valid @RequestBody Powerup powerup) {
         if (powerupService.getPowerupById(id) == null) throw new EntityNotFoundException("Powerup não encontrado.");
 
-        powerupService.savePowerup(powerup);
-        return ResponseEntity.status(HttpStatus.OK).body(powerup);
+        powerup.setId(id);
+        powerup.setName(powerup.getName().strip());
+        Powerup updatedPowerup = powerupService.savePowerup(powerup);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedPowerup);
     }
 
     @PatchMapping("/update/{id}")
     @Operation(summary = "Atualizar parcialmente um powerup", description = "Atualiza parcialmente os dados de um powerup baseado no ID.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Powerup atualizado com sucesso", content = @Content),
+            @ApiResponse(responseCode = "200", description = "Powerup atualizado com sucesso", content = @Content(schema = @Schema(implementation = Powerup.class))),
             @ApiResponse(responseCode = "404", description = "Powerup não encontrado", content = @Content),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> updatePowerupPartially(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
-        Powerup existingPowerup = powerupService.getPowerupById(id);  // validando se existe
+    public ResponseEntity<?> updatePowerupPartially(
+            @Parameter(description = "ID do powerup a ser atualizado parcialmente", required = true)
+            @PathVariable Long id,
+            @Parameter(description = "Campos a serem atualizados", required = true)
+            @RequestBody Map<String, Object> updates) {
+        Powerup existingPowerup = powerupService.getPowerupById(id);
         if (existingPowerup == null) throw new EntityNotFoundException("Powerup não encontrado.");
 
         updates.forEach((key, value) -> {
             try {
                 switch (key) {
-                    case "name":
-                        existingPowerup.setName((String) value);
-                        break;
-                    case "price":
-                        existingPowerup.setPrice((Integer) value);
-                        break;
-                    case "storePictureUrl":
-                        existingPowerup.setStorePictureUrl((String) value);
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Campo " + key + " não é atualizável.");
+                    case "name" -> existingPowerup.setName(((String) value).strip());
+                    case "price" -> existingPowerup.setPrice((Integer) value);
+                    case "storePictureUrl" -> existingPowerup.setStorePictureUrl((String) value);
+                    default -> throw new IllegalArgumentException("Campo " + key + " não é atualizável.");
                 }
             } catch (ClassCastException e) {
                 throw new IllegalArgumentException("Valor inválido para o campo " + key + ": " + e.getMessage(), e);
@@ -143,7 +155,7 @@ public class PowerupController {
         Map<String, String> errors = ControllerUtils.verifyObject(existingPowerup, new ArrayList<>(updates.keySet()));
         if (!errors.isEmpty()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
 
-        powerupService.savePowerup(existingPowerup);
-        return ResponseEntity.status(HttpStatus.OK).body("Powerup atualizado com sucesso.");
+        Powerup updatedPowerup = powerupService.savePowerup(existingPowerup);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedPowerup);
     }
 }

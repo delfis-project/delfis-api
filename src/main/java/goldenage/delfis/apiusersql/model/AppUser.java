@@ -14,7 +14,6 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -38,6 +37,7 @@ public class AppUser {
     @NotNull(message = "O apelido não pode ser nulo")
     @Size(min = 3, max = 20, message = "O apelido deve ter pelo menos 3 caracteres e no máximo 20")
     @Schema(description = "Apelido único do usuário", example = "jvdinizaraujo")
+    @Column(unique = true)
     private String username;
 
     @NotNull(message = "A senha não pode ser nula")
@@ -50,6 +50,7 @@ public class AppUser {
             regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}",
             flags = Pattern.Flag.CASE_INSENSITIVE)
     @Schema(description = "Email único do usuário", example = "jvdinizaraujo@gmail.com")
+    @Column(unique = true)
     private String email;
 
     @NotNull(message = "O level não pode ser nulo")
@@ -68,63 +69,35 @@ public class AppUser {
     private int coins;
 
     @NotNull(message = "Data de nascimento não pode ser nula")
-    @Past(message = "Data de nascimento não pode ser futura")
     @Column(name = "birth_date")
     @Schema(description = "Data de nascimento do usuário", example = "1990-05-15")
     private LocalDate birthDate;
 
-    @NotNull(message = "A foto não pode ser nula")
     @Size(min = 10, message = "A foto deve ter pelo menos 10 caracteres")
     @Schema(description = "Url da foto de perfil do usuário", example = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnGUKEObKP7a2L1helo1SZY1HLowd4ACTvqw&s")
     @Column(name = "picture_url")
     private String pictureUrl;
 
-    @ManyToOne
     @NotNull(message = "O usuário deve ter um plano")
-    @JoinColumn(name = "fk_plan_id")
-    @Schema(description = "Plano do usuário", example = "{ \"id\": 1, \"name\": \"Premium\", \"price\": 29.99 }")
-    private Plan plan;
+    @Column(name = "fk_plan_id")
+    @Schema(description = "Fk do plano do usuário", example = "1")
+    private long fkPlanId;
 
-    @ManyToOne
-    @JoinColumn(name = "fk_user_role_id")
-    @Schema(description = "Papel do usuário", example = "{ \"id\": 1, \"name\": \"Administrador\" }")
+    @Column(name = "fk_user_role_id")
+    @Schema(description = "Fk do papel do usuário", example = "1")
     @NotNull(message = "O usuário deve ter um papel")
-    private UserRole userRole;
+    private long fkUserRoleId;
 
-    @NotNull(message = "A data de criação da conta não pode ser nula")
-    @Past(message = "A data de criação não pode ser futura")
+    @Column(name = "fk_address_id")
+    @Schema(description = "Fk do endereço do usuário", example = "1")
+    @NotNull(message = "O usuário deve ter um endereço")
+    private long fkAddressId;
+
     @Column(name = "created_at")
     @Schema(description = "Data e hora de criação da conta", example = "2024-08-15T14:30:00")
     private LocalDateTime createdAt;
 
-    @Past(message = "A data de atualização não pode ser futura")
     @Column(name = "updated_at")
     @Schema(description = "Data e hora da última atualização da conta", example = "2024-08-18T10:00:00")
     private LocalDateTime updatedAt;
-
-    @OneToMany
-    @Schema(description = "Lista de streaks do usuário", implementation = Streak.class)
-    private List<Streak> streaks;
-
-    @OneToMany
-    @Schema(description = "Lista de pagamentos de plano do usuário", implementation = PlanPayment.class)
-    private List<PlanPayment> payments;
-
-    @ManyToMany
-    @JoinTable(
-            name = "app_user_powerup",
-            joinColumns = @JoinColumn(name = "fk_app_user_id"),
-            inverseJoinColumns = @JoinColumn(name = "fk_powerup_id")
-    )
-    @Schema(description = "Lista de powerups do usuário", implementation = Powerup.class)
-    private List<Powerup> powerups;
-
-    @ManyToMany
-    @JoinTable(
-            name = "app_user_theme",
-            joinColumns = @JoinColumn(name = "fk_app_user_id"),
-            inverseJoinColumns = @JoinColumn(name = "fk_theme_id")
-    )
-    @Schema(description = "Lista de temas do usuário", implementation = Theme.class)
-    private List<Theme> themes;
 }
