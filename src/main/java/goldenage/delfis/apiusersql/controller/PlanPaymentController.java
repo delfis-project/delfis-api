@@ -7,10 +7,13 @@
 
 package goldenage.delfis.apiusersql.controller;
 
-import goldenage.delfis.apiusersql.model.PlanPayment;
+import goldenage.delfis.apiusersql.model.*;
+import goldenage.delfis.apiusersql.service.AppUserService;
 import goldenage.delfis.apiusersql.service.PlanPaymentService;
+import goldenage.delfis.apiusersql.service.PlanService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -28,20 +31,24 @@ import java.util.List;
 @RequestMapping("/api/plan-payment")
 public class PlanPaymentController {
     private final PlanPaymentService planPaymentService;
+    private final PlanService planService;
+    private final AppUserService appUserService;
 
-    public PlanPaymentController(PlanPaymentService planPaymentService) {
+    public PlanPaymentController(PlanPaymentService planPaymentService, PlanService planService, AppUserService appUserService) {
         this.planPaymentService = planPaymentService;
+        this.planService = planService;
+        this.appUserService = appUserService;
     }
 
     @GetMapping("/get-all")
     @Operation(summary = "Obter todos os pagamentos de planos", description = "Retorna uma lista de todos os pagamentos de planos registrados.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de pagamentos de planos encontrada", content = @Content(schema = @Schema(implementation = PlanPayment.class))),
+            @ApiResponse(responseCode = "200", description = "Lista de pagamentos de planos encontrada", content = @Content(array = @ArraySchema(schema = @Schema(implementation = PlanPayment.class)))),
             @ApiResponse(responseCode = "404", description = "Nenhum pagamento encontrado", content = @Content)
     })
-    public ResponseEntity<?> getPlanPayments() {
+    public ResponseEntity<List<PlanPayment>> getPlanPayments() {
         List<PlanPayment> planPayments = planPaymentService.getPlanPayments();
-        if (!planPayments.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(planPayments);
+        if (planPayments != null) return ResponseEntity.status(HttpStatus.OK).body(planPayments);
 
         throw new EntityNotFoundException("Nenhum pagamento encontrado.");
     }
@@ -49,10 +56,10 @@ public class PlanPaymentController {
     @GetMapping("/get-by-app-user/{id}")
     @Operation(summary = "Obter pagamentos por usuário", description = "Retorna uma lista de pagamentos de planos associados ao usuário fornecido.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de pagamentos encontrada", content = @Content(schema = @Schema(implementation = PlanPayment.class))),
+            @ApiResponse(responseCode = "200", description = "Lista de pagamentos encontrada", content = @Content(array = @ArraySchema(schema = @Schema(implementation = PlanPayment.class)))),
             @ApiResponse(responseCode = "404", description = "Nenhum pagamento encontrado", content = @Content)
     })
-    public ResponseEntity<?> getPlanPaymentsByAppUserId(
+    public ResponseEntity<List<PlanPayment>> getPlanPaymentsByAppUserId(
             @Parameter(description = "ID do usuário para buscar pagamentos", required = true)
             @PathVariable Long id) {
         List<PlanPayment> planPayments = planPaymentService.getPlanPaymentsByAppUserId(id);
@@ -64,10 +71,10 @@ public class PlanPaymentController {
     @GetMapping("/get-by-plan/{id}")
     @Operation(summary = "Obter pagamentos por plano", description = "Retorna uma lista de pagamentos de planos associados ao plano fornecido.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de pagamentos encontrada", content = @Content(schema = @Schema(implementation = PlanPayment.class))),
+            @ApiResponse(responseCode = "200", description = "Lista de pagamentos encontrada", content = @Content(array = @ArraySchema(schema = @Schema(implementation = PlanPayment.class)))),
             @ApiResponse(responseCode = "404", description = "Nenhum pagamento encontrado", content = @Content)
     })
-    public ResponseEntity<?> getPlanPaymentsByPlanId(
+    public ResponseEntity<List<PlanPayment>> getPlanPaymentsByPlanId(
             @Parameter(description = "ID do plano para buscar pagamentos", required = true)
             @PathVariable Long id) {
         List<PlanPayment> planPayments = planPaymentService.getPlanPaymentByPlanId(id);
@@ -83,14 +90,15 @@ public class PlanPaymentController {
             @ApiResponse(responseCode = "409", description = "Conflito - Pagamento já existente", content = @Content),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> insertPlanPayment(
+    public ResponseEntity<PlanPayment> insertPlanPayment(
             @Parameter(description = "Dados do novo pagamento de plano", required = true)
             @Valid @RequestBody PlanPayment planPayment) {
         try {
-            PlanPayment savedPlanPayment = planPaymentService.savePlanPayment(planPayment);
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedPlanPayment);
+            verifyFks(planPayment);
+            PlanPayment createdPlanPayment = planPaymentService.savePlanPayment(planPayment);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdPlanPayment);
         } catch (DataIntegrityViolationException dive) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Pagamento já existente.");
+            throw new DataIntegrityViolationException("Pagamento já existente.");
         }
     }
 
@@ -119,15 +127,26 @@ public class PlanPaymentController {
             @ApiResponse(responseCode = "404", description = "Pagamento não encontrado", content = @Content),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> updatePlanPayment(
+    public ResponseEntity<PlanPayment> updatePlanPayment(
             @Parameter(description = "ID do pagamento a ser atualizado", required = true)
             @PathVariable Long id,
             @Parameter(description = "Novos dados do pagamento de plano", required = true)
             @Valid @RequestBody PlanPayment planPayment) {
         if (planPaymentService.getPlanPaymentById(id) == null) throw new EntityNotFoundException("Pagamento não encontrado.");
 
+        verifyFks(planPayment);
         planPayment.setId(id);
-        planPaymentService.savePlanPayment(planPayment);
-        return ResponseEntity.status(HttpStatus.OK).body(planPayment);
+        PlanPayment updatedPlanPayment = planPaymentService.savePlanPayment(planPayment);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedPlanPayment);
+    }
+
+    private void verifyFks(PlanPayment planPayment) {
+        Plan plan = planService.getPlanById((planPayment.getFkPlanId()));
+        if (plan == null) throw new EntityNotFoundException("Plano não encontrado.");
+        planPayment.setFkPlanId(plan.getId());
+
+        AppUser appUser = appUserService.getAppUserById(planPayment.getFkAppUserId());
+        if (appUser == null) throw new ClassCastException("Usuário não encontrado.");
+        planPayment.setFkAppUserId(appUser.getId());
     }
 }

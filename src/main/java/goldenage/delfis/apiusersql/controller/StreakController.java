@@ -7,10 +7,15 @@
 
 package goldenage.delfis.apiusersql.controller;
 
+import goldenage.delfis.apiusersql.model.AppUser;
+import goldenage.delfis.apiusersql.model.Plan;
 import goldenage.delfis.apiusersql.model.Streak;
+import goldenage.delfis.apiusersql.service.AppUserService;
 import goldenage.delfis.apiusersql.service.StreakService;
+import goldenage.delfis.apiusersql.util.ControllerUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -31,35 +36,37 @@ import java.util.Map;
 @RequestMapping("/api/streak")
 public class StreakController {
     private final StreakService streakService;
+    private final AppUserService appUserService;
 
-    public StreakController(StreakService streakService) {
+    public StreakController(StreakService streakService, AppUserService appUserService) {
         this.streakService = streakService;
+        this.appUserService = appUserService;
     }
 
     @GetMapping("/get-all")
     @Operation(summary = "Obter todos os streaks", description = "Retorna uma lista de todos os streaks registrados.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de streaks encontrada", content = @Content(schema = @Schema(implementation = Streak.class))),
+            @ApiResponse(responseCode = "200", description = "Lista de streaks encontrada", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Streak.class)))),
             @ApiResponse(responseCode = "404", description = "Nenhum streak encontrado", content = @Content)
     })
     public ResponseEntity<List<Streak>> getStreaks() {
         List<Streak> streaks = streakService.getStreaks();
-        if (streaks != null) return ResponseEntity.ok(streaks);
+        if (streaks != null) return ResponseEntity.status(HttpStatus.OK).body(streaks);
 
         throw new EntityNotFoundException("Nenhum streak encontrado.");
     }
 
-    @PostMapping("/get-by-initial-date-before")
+    @GetMapping("/get-by-initial-date-before/{initialDate}")
     @Operation(summary = "Obter streaks com data inicial anterior", description = "Retorna uma lista de streaks cuja data inicial é anterior à fornecida.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de streaks encontrada", content = @Content(schema = @Schema(implementation = Streak.class))),
+            @ApiResponse(responseCode = "200", description = "Lista de streaks encontrada", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Streak.class)))),
             @ApiResponse(responseCode = "404", description = "Nenhum streak encontrado", content = @Content)
     })
     public ResponseEntity<List<Streak>> getStreaksByInitialDateBefore(
             @Parameter(description = "Data inicial para filtragem dos streaks", required = true)
-            @RequestBody LocalDate initialDate) {
+            @PathVariable LocalDate initialDate) {
         List<Streak> streaks = streakService.getStreaksByInitialDateBefore(initialDate);
-        if (streaks != null) return ResponseEntity.ok(streaks);
+        if (streaks != null) return ResponseEntity.status(HttpStatus.OK).body(streaks);
 
         throw new EntityNotFoundException("Nenhum streak encontrado com a data inicial fornecida.");
     }
@@ -67,14 +74,14 @@ public class StreakController {
     @GetMapping("/get-by-app-user/{id}")
     @Operation(summary = "Obter streaks por usuário", description = "Retorna uma lista de streaks associados ao usuário fornecido.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de streaks encontrada", content = @Content(schema = @Schema(implementation = Streak.class))),
+            @ApiResponse(responseCode = "200", description = "Lista de streaks encontrada", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Streak.class)))),
             @ApiResponse(responseCode = "404", description = "Nenhum streak encontrado", content = @Content)
     })
     public ResponseEntity<List<Streak>> getStreaksByAppUser(
             @Parameter(description = "ID do usuário para filtragem dos streaks", required = true)
             @PathVariable Long id) {
         List<Streak> streaks = streakService.getStreaksByAppUserId(id);
-        if (streaks != null) return ResponseEntity.ok(streaks);
+        if (streaks != null) return ResponseEntity.status(HttpStatus.OK).body(streaks);
 
         throw new EntityNotFoundException("Nenhum streak encontrado para o usuário fornecido.");
     }
@@ -86,14 +93,15 @@ public class StreakController {
             @ApiResponse(responseCode = "409", description = "Conflito - Streak já existente", content = @Content),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> insertStreak(
+    public ResponseEntity<Streak> insertStreak(
             @Parameter(description = "Dados do novo streak", required = true)
             @Valid @RequestBody Streak streak) {
         try {
+            verifyFk(streak);
             Streak savedStreak = streakService.saveStreak(streak);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedStreak);
         } catch (DataIntegrityViolationException dive) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("AppUser não existe.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
     }
 
@@ -109,7 +117,7 @@ public class StreakController {
             @PathVariable Long id) {
         try {
             if (streakService.deleteStreakById(id) == null) throw new EntityNotFoundException("Streak não encontrado.");
-            return ResponseEntity.ok("Streak deletado com sucesso.");
+            return ResponseEntity.status(HttpStatus.OK).body("Streak deletado com sucesso.");
         } catch (DataIntegrityViolationException dive) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Existem usuários cadastrados com esse streak. Mude-os para excluir esse streak.");
         }
@@ -129,15 +137,16 @@ public class StreakController {
             @Valid @RequestBody Streak streak) {
         if (streakService.getStreakById(id) == null) throw new EntityNotFoundException("Streak não encontrado.");
 
+        verifyFk(streak);
         streak.setId(id);
-        streakService.saveStreak(streak);
-        return ResponseEntity.ok(streak);
+        Streak updatedStreak = streakService.saveStreak(streak);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedStreak);
     }
 
     @PatchMapping("/update/{id}")
     @Operation(summary = "Atualizar parcialmente um streak", description = "Atualiza parcialmente os dados de um streak baseado no ID.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Streak atualizado com sucesso", content = @Content),
+            @ApiResponse(responseCode = "200", description = "Streak atualizado com sucesso", content = @Content(schema = @Schema(implementation = Streak.class))),
             @ApiResponse(responseCode = "404", description = "Streak não encontrado", content = @Content),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
@@ -152,8 +161,8 @@ public class StreakController {
         updates.forEach((key, value) -> {
             try {
                 switch (key) {
-                    case "initialDate" -> existingStreak.setInitialDate((LocalDate) value);
-                    case "finalDate" -> existingStreak.setFinalDate((LocalDate) value);
+                    case "initialDate" -> existingStreak.setInitialDate(LocalDate.parse((String) value));
+                    case "finalDate" -> existingStreak.setFinalDate(LocalDate.parse((String) value));
                     default -> throw new IllegalArgumentException("Campo " + key + " não é atualizável.");
                 }
             } catch (ClassCastException e) {
@@ -165,7 +174,13 @@ public class StreakController {
         Map<String, String> errors = ControllerUtils.verifyObject(existingStreak, new ArrayList<>(updates.keySet()));
         if (!errors.isEmpty()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
 
-        streakService.saveStreak(existingStreak);
-        return ResponseEntity.ok("Streak atualizado com sucesso.");
+        Streak updatedStreak = streakService.saveStreak(existingStreak);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedStreak);
+    }
+
+    private void verifyFk(Streak streak) {
+        AppUser appUser = appUserService.getAppUserById((streak.getFkAppUserId()));
+        if (appUser == null) throw new EntityNotFoundException("Usuário não encontrado.");
+        streak.setFkAppUserId(appUser.getId());
     }
 }

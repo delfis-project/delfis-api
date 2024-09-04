@@ -9,8 +9,10 @@ package goldenage.delfis.apiusersql.controller;
 
 import goldenage.delfis.apiusersql.model.Plan;
 import goldenage.delfis.apiusersql.service.PlanService;
+import goldenage.delfis.apiusersql.util.ControllerUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -39,10 +41,10 @@ public class PlanController {
     @GetMapping("/get-all")
     @Operation(summary = "Obter todos os planos", description = "Retorna uma lista de todos os planos registrados.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de planos encontrada", content = @Content(schema = @Schema(implementation = Plan.class))),
+            @ApiResponse(responseCode = "200", description = "Lista de planos encontrada", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Plan.class)))),
             @ApiResponse(responseCode = "404", description = "Nenhum plano encontrado", content = @Content)
     })
-    public ResponseEntity<?> getPlans() {
+    public ResponseEntity<List<Plan>> getPlans() {
         List<Plan> plans = planService.getPlans();
         if (plans != null) return ResponseEntity.status(HttpStatus.OK).body(plans);
 
@@ -55,7 +57,7 @@ public class PlanController {
             @ApiResponse(responseCode = "200", description = "Plano encontrado", content = @Content(schema = @Schema(implementation = Plan.class))),
             @ApiResponse(responseCode = "404", description = "Nenhum plano encontrado", content = @Content)
     })
-    public ResponseEntity<?> getPlanByName(
+    public ResponseEntity<Plan> getPlanByName(
             @Parameter(description = "Nome do plano a ser buscado", required = true)
             @PathVariable String name) {
         Plan plan = planService.getPlanByName(name.strip());
@@ -67,10 +69,10 @@ public class PlanController {
     @GetMapping("/get-by-price-less-than-equal/{value}")
     @Operation(summary = "Obter planos por preço menor ou igual", description = "Retorna uma lista de planos com preço menor ou igual ao valor fornecido.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de planos encontrada", content = @Content(schema = @Schema(implementation = Plan.class))),
+            @ApiResponse(responseCode = "200", description = "Lista de planos encontrada", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Plan.class)))),
             @ApiResponse(responseCode = "404", description = "Nenhum plano encontrado", content = @Content)
     })
-    public ResponseEntity<?> getPlansByPriceIsLessThanEqual(
+    public ResponseEntity<List<Plan>> getPlansByPriceIsLessThanEqual(
             @Parameter(description = "Valor máximo do preço", required = true)
             @PathVariable BigDecimal value) {
         List<Plan> plans = planService.getPlansByPriceIsLessThanEqual(value);
@@ -82,10 +84,10 @@ public class PlanController {
     @GetMapping("/get-by-price-greater-than-equal/{value}")
     @Operation(summary = "Obter planos por preço maior ou igual", description = "Retorna uma lista de planos com preço maior ou igual ao valor fornecido.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de planos encontrada", content = @Content(schema = @Schema(implementation = Plan.class))),
+            @ApiResponse(responseCode = "200", description = "Lista de planos encontrada", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Plan.class)))),
             @ApiResponse(responseCode = "404", description = "Nenhum plano encontrado", content = @Content)
     })
-    public ResponseEntity<?> getPlansByPriceIsGreaterThanEqual(
+    public ResponseEntity<List<Plan>> getPlansByPriceIsGreaterThanEqual(
             @Parameter(description = "Valor mínimo do preço", required = true)
             @PathVariable BigDecimal value) {
         List<Plan> plans = planService.getPlansByPriceIsGreaterThanEqual(value);
@@ -101,7 +103,7 @@ public class PlanController {
             @ApiResponse(responseCode = "409", description = "Conflito - Plano com o mesmo nome ou foto já existente", content = @Content),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> insertPlan(
+    public ResponseEntity<Plan> insertPlan(
             @Parameter(description = "Dados do novo plano", required = true)
             @Valid @RequestBody Plan plan) {
         try {
@@ -109,7 +111,7 @@ public class PlanController {
             Plan savedPlan = planService.savePlan(plan);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedPlan);
         } catch (DataIntegrityViolationException dive) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Plano com esse nome ou foto já existente.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
     }
 
@@ -138,7 +140,7 @@ public class PlanController {
             @ApiResponse(responseCode = "404", description = "Plano não encontrado", content = @Content),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> updatePlan(
+    public ResponseEntity<Plan> updatePlan(
             @Parameter(description = "ID do plano a ser atualizado", required = true)
             @PathVariable Long id,
             @Parameter(description = "Novos dados do plano", required = true)
@@ -147,14 +149,14 @@ public class PlanController {
 
         plan.setId(id);
         plan.setName(plan.getName().strip());
-        planService.savePlan(plan);
-        return ResponseEntity.status(HttpStatus.OK).body(plan);
+        Plan updatedPlan = planService.savePlan(plan);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedPlan);
     }
 
     @PatchMapping("/update/{id}")
     @Operation(summary = "Atualizar parcialmente um plano", description = "Atualiza parcialmente um plano baseado no ID.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Plano atualizado com sucesso", content = @Content),
+            @ApiResponse(responseCode = "200", description = "Plano atualizado com sucesso", content = @Content(schema = @Schema(implementation = Plan.class))),
             @ApiResponse(responseCode = "404", description = "Plano não encontrado", content = @Content),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
@@ -188,7 +190,7 @@ public class PlanController {
         Map<String, String> errors = ControllerUtils.verifyObject(existingPlan, new ArrayList<>(updates.keySet()));
         if (!errors.isEmpty()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
 
-        planService.savePlan(existingPlan);
-        return ResponseEntity.status(HttpStatus.OK).body("Plano atualizado com sucesso.");
+        Plan updatedPlan = planService.savePlan(existingPlan);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedPlan);
     }
 }

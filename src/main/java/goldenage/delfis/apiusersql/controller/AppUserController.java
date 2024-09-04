@@ -7,10 +7,15 @@
 
 package goldenage.delfis.apiusersql.controller;
 
+import goldenage.delfis.apiusersql.model.Address;
 import goldenage.delfis.apiusersql.model.AppUser;
 import goldenage.delfis.apiusersql.model.Plan;
 import goldenage.delfis.apiusersql.model.UserRole;
+import goldenage.delfis.apiusersql.service.AddressService;
 import goldenage.delfis.apiusersql.service.AppUserService;
+import goldenage.delfis.apiusersql.service.PlanService;
+import goldenage.delfis.apiusersql.service.UserRoleService;
+import goldenage.delfis.apiusersql.util.ControllerUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -36,9 +41,15 @@ import java.util.Map;
 @RequestMapping("/api/app-user")
 public class AppUserController {
     private final AppUserService appUserService;
+    private final PlanService planService;
+    private final UserRoleService userRoleService;
+    private final AddressService addressService;
 
-    public AppUserController(AppUserService appUserService) {
+    public AppUserController(AppUserService appUserService, PlanService planService, UserRoleService userRoleService, AddressService addressService) {
         this.appUserService = appUserService;
+        this.planService = planService;
+        this.userRoleService = userRoleService;
+        this.addressService = addressService;
     }
 
     @GetMapping("/get-all")
@@ -139,16 +150,19 @@ public class AppUserController {
             @ApiResponse(responseCode = "409", description = "Conflito - Usuário com nome já existente", content = @Content),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> insertAppUser(
+    public ResponseEntity<AppUser> insertAppUser(
             @Parameter(description = "Dados do novo usuário", required = true)
             @Valid @RequestBody AppUser appUser) {
         try {
             appUser.setCreatedAt(LocalDateTime.now());
             appUser.setLevel(1);
+
+            verifyFks(appUser);
+
             AppUser savedAppUser = appUserService.saveAppUser(appUser);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedAppUser);
         } catch (DataIntegrityViolationException dive) {
-            throw new DataIntegrityViolationException("Usuário com esse nome já existente.");
+            throw new DataIntegrityViolationException(dive.getMessage());
         }
     }
 
@@ -164,7 +178,8 @@ public class AppUserController {
             @Parameter(description = "ID do usuário a ser deletado", required = true)
             @PathVariable Long id) {
         try {
-            if (appUserService.deleteAppUserById(id) == null) throw new EntityNotFoundException("Usuário não encontrado.");
+            if (appUserService.deleteAppUserById(id) == null)
+                throw new EntityNotFoundException("Usuário não encontrado.");
             return ResponseEntity.status(HttpStatus.OK).body("Usuário deletado com sucesso.");
         } catch (DataIntegrityViolationException dive) {
             throw new DataIntegrityViolationException("Existem dependências para esse usuário. Mude-as para excluir esse usuário.");
@@ -178,33 +193,36 @@ public class AppUserController {
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado", content = @Content),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> updateAppUser(
+    public ResponseEntity<AppUser> updateAppUser(
             @Parameter(description = "ID do usuário a ser atualizado", required = true)
             @PathVariable Long id,
             @Parameter(description = "Novos dados do usuário", required = true)
             @Valid @RequestBody AppUser appUser) {
         if (appUserService.getAppUserById(id) == null) throw new EntityNotFoundException("Usuário não encontrado.");
 
+        verifyFks(appUser);
+
         appUser.setId(id);
         appUser.setName(appUser.getName().strip().toUpperCase());
         appUser.setPassword(new BCryptPasswordEncoder().encode(appUser.getPassword()));
         appUser.setUpdatedAt(LocalDateTime.now());
 
-        appUserService.saveAppUser(appUser);
-        return ResponseEntity.status(HttpStatus.OK).body(appUser);
+        AppUser updatedAppUser = appUserService.saveAppUser(appUser);
+        if (updatedAppUser == null) throw new RuntimeException("Erro durante atualização");
+        return ResponseEntity.status(HttpStatus.OK).body(updatedAppUser);
     }
 
     @PatchMapping("/update/{id}")
-    @Operation(summary = "Atualizar parcialmente um usuário", description = "Atualiza alguns dados de um usuário baseado no ID.")
+    @Operation(summary = "Atualizar parcialmente um usuário", description = "Atualiza parcialmente os dados de um usuário existente.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Usuário atualizado com sucesso", content = @Content(schema = @Schema(implementation = AppUser.class))),
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado", content = @Content),
-            @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content)
+            @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content)
     })
-    public ResponseEntity<?> updateAppUserPartially(
+    public ResponseEntity<?> updatePartialAppUser(
             @Parameter(description = "ID do usuário a ser atualizado", required = true)
             @PathVariable Long id,
-            @Parameter(description = "Campos a serem atualizados", required = true)
+            @Parameter(description = "Dados parciais para atualização", required = true)
             @RequestBody Map<String, Object> updates) {
         AppUser existingAppUser = appUserService.getAppUserById(id);  // validando se existe
         if (existingAppUser == null) throw new EntityNotFoundException("Usuário não encontrado.");
@@ -220,10 +238,23 @@ public class AppUserController {
                     case "level" -> existingAppUser.setLevel((Integer) value);
                     case "points" -> existingAppUser.setPoints((Integer) value);
                     case "coins" -> existingAppUser.setCoins((Integer) value);
-                    case "birthDate" -> existingAppUser.setBirthDate((LocalDate) value);
+                    case "birthDate" -> existingAppUser.setBirthDate(LocalDate.parse((String) value));
                     case "pictureUrl" -> existingAppUser.setPictureUrl((String) value);
-                    case "plan" -> existingAppUser.setPlan((Plan) value);
-                    case "userRole" -> existingAppUser.setUserRole((UserRole) value);
+                    case "fkPlanId" -> {
+                        Plan plan = planService.getPlanById(((Integer) value).longValue());
+                        if (plan == null) throw new ClassCastException("Plano não encontrado.");
+                        existingAppUser.setFkPlanId(plan.getId());
+                    }
+                    case "fkUserRoleId" -> {
+                        UserRole userRole = userRoleService.getUserRoleById(((Integer) value).longValue());
+                        if (userRole == null) throw new ClassCastException("Role não encontrado.");
+                        existingAppUser.setFkUserRoleId(userRole.getId());
+                    }
+                    case "fkAddressId" -> {
+                        Address address = addressService.getAddressById(((Integer) value).longValue());
+                        if (address == null) throw new ClassCastException("Endereço não encontrado.");
+                        existingAppUser.setFkAddressId(address.getId());
+                    }
                     default -> throw new IllegalArgumentException("Campo " + key + " não é atualizável.");
                 }
             } catch (ClassCastException e) {
@@ -236,7 +267,22 @@ public class AppUserController {
         if (!errors.isEmpty()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
 
         existingAppUser.setUpdatedAt(LocalDateTime.now());
-        appUserService.saveAppUser(existingAppUser);
-        return ResponseEntity.status(HttpStatus.OK).body("Usuário atualizado com sucesso.");
+        AppUser appUserInserted = appUserService.saveAppUser(existingAppUser);
+        if (appUserInserted == null) throw new RuntimeException("Erro durante inserção");
+        return ResponseEntity.status(HttpStatus.OK).body(appUserInserted);
+    }
+
+    private void verifyFks(AppUser appUser) {
+        Plan plan = planService.getPlanById((appUser.getFkPlanId()));
+        if (plan == null) throw new EntityNotFoundException("Plano não encontrado.");
+        appUser.setFkPlanId(plan.getId());
+
+        UserRole userRole = userRoleService.getUserRoleById(appUser.getFkUserRoleId());
+        if (userRole == null) throw new ClassCastException("Role não encontrado.");
+        appUser.setFkUserRoleId(userRole.getId());
+
+        Address address = addressService.getAddressById(appUser.getFkAddressId());
+        if (address == null) throw new ClassCastException("Endereço não encontrado.");
+        appUser.setFkAddressId(address.getId());
     }
 }

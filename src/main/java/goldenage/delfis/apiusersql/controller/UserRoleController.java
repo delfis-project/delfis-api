@@ -11,6 +11,7 @@ import goldenage.delfis.apiusersql.model.UserRole;
 import goldenage.delfis.apiusersql.service.UserRoleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+
 import java.util.List;
 
 @RestController
@@ -36,7 +38,7 @@ public class UserRoleController {
     @GetMapping("/get-all")
     @Operation(summary = "Obter todas as roles de usuário", description = "Retorna uma lista de todas as roles de usuário registradas.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de roles encontrada", content = @Content(schema = @Schema(implementation = UserRole.class))),
+            @ApiResponse(responseCode = "200", description = "Lista de roles encontrada", content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserRole.class)))),
             @ApiResponse(responseCode = "404", description = "Nenhuma role encontrada", content = @Content)
     })
     public ResponseEntity<List<UserRole>> getUserRoles() {
@@ -77,7 +79,7 @@ public class UserRoleController {
             @PathVariable Long id) {
         try {
             if (userRoleService.deleteUserRoleById(id) == null) throw new EntityNotFoundException("Role não encontrada.");
-            return ResponseEntity.ok("Role deletada com sucesso.");
+            return ResponseEntity.status(HttpStatus.OK).body("Role deletada com sucesso.");
         } catch (DataIntegrityViolationException dive) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Existem usuários cadastrados com essa role. Mude-os para excluir essa role.");
         }
@@ -100,6 +102,6 @@ public class UserRoleController {
         userRole.setId(id);
         userRole.setName(userRole.getName().strip().toUpperCase());
         UserRole updatedUserRole = userRoleService.saveUserRole(userRole);
-        return ResponseEntity.ok(updatedUserRole);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedUserRole);
     }
 }

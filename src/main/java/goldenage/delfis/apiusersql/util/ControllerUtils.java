@@ -38,4 +38,20 @@ public class ControllerUtils {
 
         return errors;
     }
+
+    public static String getDiveSpecificMessage(String rootMessage) {
+        rootMessage = rootMessage.toUpperCase().strip();
+        String specificMessage;
+        if (rootMessage.contains("FOREIGN KEY")) {
+            specificMessage = "Erro ao salvar o usuário: uma das referências de chave estrangeira é inválida ou não existe.";
+        } else if (rootMessage.contains("UNIQUE")) {
+            specificMessage = "Erro ao salvar o usuário: um campo que deve ser único já está em uso.";
+        } else if (rootMessage.contains("NULL NOT ALLOWED")) {
+            specificMessage = "Erro ao salvar o usuário: um campo obrigatório não foi preenchido.";
+        } else {
+            specificMessage = "Erro de integridade de dados ao salvar o usuário.";
+        }
+
+        return specificMessage;
+    }
 }
