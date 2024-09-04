@@ -10,5 +10,5 @@ FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 COPY --from=Build /app/target/*.jar app.jar
-EXPOSE 6969
+EXPOSE 8083
 ENTRYPOINT ["java", "-jar", "app.jar"]
