@@ -1,0 +1,5 @@
+foto preview tema
+periodicidade plano
+verificacao duplicatas
+verificacao data passada
+colocar regra negocio no service - maquiar controllers
