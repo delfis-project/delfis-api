@@ -11,8 +11,8 @@
 	<groupId>goldenage.delfis</groupId>
 	<artifactId>api-delfis</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>api-user-sql</name>
-	<description>api-user-sql</description>
+	<name>api-delfis</name>
+	<description>api-delfis</description>
 	<url/>
 	<licenses>
 		<license/>
