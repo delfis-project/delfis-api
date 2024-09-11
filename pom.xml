@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>goldenage.delfis</groupId>
-	<artifactId>api-delfis</artifactId>
+	<artifactId>delfis-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>api-delfis</name>
-	<description>api-delfis</description>
+	<name>delfis-api</name>
+	<description>delfis-api</description>
 	<url/>
 	<licenses>
 		<license/>
