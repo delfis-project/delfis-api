@@ -7,6 +7,12 @@ import goldenage.delfis.apiusersql.service.AppUserService;
 import goldenage.delfis.apiusersql.service.UserRoleService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -29,7 +35,6 @@ public class AuthController {
     private final UserRoleService userRoleService;
     private final PasswordEncoder passwordEncoder;
 
-
     public AuthController(AppUserService appUserService, UserRoleService userRoleService,
                           PasswordEncoder passwordEncoder, SecretKey secretKey) {
         this.appUserService = appUserService;
@@ -38,6 +43,16 @@ public class AuthController {
         this.secretKey = secretKey;
     }
 
+    @Operation(summary = "Login do usuário", description = "Autentica o usuário e retorna um token JWT.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login realizado com sucesso.",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Map.class))),
+            @ApiResponse(responseCode = "401", description = "Credenciais inválidas.",
+                    content = @Content),
+            @ApiResponse(responseCode = "500", description = "Erro ao gerar o token JWT.",
+                    content = @Content)
+    })
     @PostMapping("/api/auth/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         AppUser appUser = appUserService.getAppUserByUsername(loginRequest.getUsername());
@@ -64,6 +79,10 @@ public class AuthController {
         }
     }
 
+    @Operation(summary = "Endpoint para manter a API no ar.", description = "Endpoint que retorna 200 para manter a API no ar usando o site https://keepalive.dashdashhard.com.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content)
+    })
     @GetMapping("/api/auth/keep-alive")
     public ResponseEntity<?> keepAlive() {
         return ResponseEntity.status(HttpStatus.OK).body(null);
