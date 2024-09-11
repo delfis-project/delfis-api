@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -61,5 +62,10 @@ public class AuthController {
             logger.error("Credenciais inválidas para: {}", loginRequest.getUsername());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas.");
         }
+    }
+
+    @GetMapping("/api/auth/keep-alive")
+    public ResponseEntity<?> keepAlive() {
+        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 }
