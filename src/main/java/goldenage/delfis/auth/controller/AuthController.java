@@ -79,9 +79,9 @@ public class AuthController {
         }
     }
 
-    @Operation(summary = "Verifica o estado da sessão", description = "Endpoint para verificar se a sessão está ativa.")
+    @Operation(summary = "Endpoint para manter a API no ar.", description = "Endpoint que retorna 200 para manter a API no ar usando o site https://keepalive.dashdashhard.com.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Sessão ativa.", content = @Content)
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content)
     })
     @GetMapping("/api/auth/keep-alive")
     public ResponseEntity<?> keepAlive() {
