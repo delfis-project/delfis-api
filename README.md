@@ -8,7 +8,7 @@ Aplicativo: https://github.com/delfis-project/delfis-app
 <br/>
 Database SQL script: https://github.com/delfis-project/db-sql
 <br/>
-Serviço hospedado no Render: https://api-delfis.onrender.com
+Serviço hospedado no Render: https://delfis-api.onrender.com
 
 ## Tecnologias utilizadas
 - Spring Boot: Framework principal para o desenvolvimento da API.
