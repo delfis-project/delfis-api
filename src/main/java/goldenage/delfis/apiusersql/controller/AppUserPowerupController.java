@@ -141,7 +141,7 @@ public class AppUserPowerupController {
         appUserPowerup.setFkPowerupId(powerup.getId());
 
         AppUser appUser = appUserService.getAppUserById(appUserPowerup.getFkAppUserId());
-        if (appUser == null) throw new ClassCastException("Usuário não encontrado.");
+        if (appUser == null) throw new EntityNotFoundException("Usuário não encontrado.");
         appUserPowerup.setFkAppUserId(appUser.getId());
     }
 }

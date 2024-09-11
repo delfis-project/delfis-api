@@ -146,7 +146,7 @@ public class PlanPaymentController {
         planPayment.setFkPlanId(plan.getId());
 
         AppUser appUser = appUserService.getAppUserById(planPayment.getFkAppUserId());
-        if (appUser == null) throw new ClassCastException("Usuário não encontrado.");
+        if (appUser == null) throw new EntityNotFoundException("Usuário não encontrado.");
         planPayment.setFkAppUserId(appUser.getId());
     }
 }
