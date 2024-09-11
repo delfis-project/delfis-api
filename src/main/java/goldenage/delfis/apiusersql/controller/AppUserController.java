@@ -278,11 +278,11 @@ public class AppUserController {
         appUser.setFkPlanId(plan.getId());
 
         UserRole userRole = userRoleService.getUserRoleById(appUser.getFkUserRoleId());
-        if (userRole == null) throw new ClassCastException("Role não encontrado.");
+        if (userRole == null) throw new EntityNotFoundException("Role não encontrado.");
         appUser.setFkUserRoleId(userRole.getId());
 
         Address address = addressService.getAddressById(appUser.getFkAddressId());
-        if (address == null) throw new ClassCastException("Endereço não encontrado.");
+        if (address == null) throw new EntityNotFoundException("Endereço não encontrado.");
         appUser.setFkAddressId(address.getId());
     }
 }
