@@ -1,4 +1,4 @@
-# api-delfis
+# delfis-api
 API utilizando a arquitetura MVC (sem views e com services) para manipulação dos nossos bancos de dados. 
 <br/>
 A aplicação foi desenvolvida para suportar o backend do aplicativo "Delfis!".
