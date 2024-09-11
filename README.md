@@ -7,7 +7,6 @@ A aplicação foi desenvolvida para suportar o backend do aplicativo "Delfis!".
 Aplicativo: https://github.com/delfis-project/delfis-app
 <br/>
 Database SQL script: https://github.com/delfis-project/db-sql
-Outros databases utilizados: MongoDB e Redis.
 <br/>
 Serviço hospedado no Render: https://api-delfis.onrender.com
 
