@@ -35,6 +35,7 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()                                       
                         .requestMatchers("/api/app-user/insert").hasRole("UNLOGGED")
+                        .requestMatchers("/api/address/insert").hasRole("UNLOGGED")
                         .requestMatchers("/api/**").hasRole("APP-USER")
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
