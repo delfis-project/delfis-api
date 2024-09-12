@@ -31,11 +31,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/auth/login").permitAll()
-                        .requestMatchers("/api/auth/keep-alive").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers("/v3/api-docs/swagger-config").permitAll()                                       
+                        .requestMatchers("/v3/api-docs/**").permitAll()                                       
                         .requestMatchers("/api/app-user/insert").hasRole("UNLOGGED")
+                        .requestMatchers("/api/address/insert").hasRole("UNLOGGED")
+                        .requestMatchers("/api/**").hasRole("APP-USER")
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
