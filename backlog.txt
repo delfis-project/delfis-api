@@ -2,3 +2,4 @@ foto preview tema
 periodicidade plano
 verificacao duplicatas
 verificacao data passada
+cascades do bd
