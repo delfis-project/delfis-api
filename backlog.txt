@@ -4,6 +4,3 @@ foto preview tema
 periodicidade plano
 verificacao duplicatas
 verificacao data passada
-
-mongo:
-https://medium.com/@lkvassoni/conectando-o-mongodb-com-uma-aplica%C3%A7%C3%A3o-java-usando-spring-data-com-transa%C3%A7%C3%B5es-00d99d525481
