@@ -1,3 +1,10 @@
+/*
+ * Enum WordSearchDirection
+ * Enum de direções da entidade WordSearch
+ * Autor: João Diniz Araujo
+ * Data: 16/09/2024
+ * */
+
 package goldenage.delfis.apigamemongo.model;
 
 public enum WordSearchDirection {
