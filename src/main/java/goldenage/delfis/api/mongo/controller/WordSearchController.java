@@ -40,9 +40,8 @@ public class WordSearchController {
     })
     public ResponseEntity<List<WordSearch>> getWordSearches() {
         List<WordSearch> wordSearches = wordSearchService.getWordSearches();
-        if (wordSearches != null && !wordSearches.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.OK).body(wordSearches);
-        }
+        if (wordSearches != null && !wordSearches.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(wordSearches);
+
         throw new EntityNotFoundException("Nenhum caça-palavras encontrado.");
     }
 
@@ -53,9 +52,10 @@ public class WordSearchController {
     })
     public ResponseEntity<WordSearch> generateWordSearch(
             @RequestParam(name = "gridSize") int gridSize,
-            @RequestParam(name = "words") String wordList) {
-        WordSearch generatedWordSearch = new WordSearch(gridSize, wordList);
-        WordSearch savedWordSearch = wordSearchService.saveWordSearch(generatedWordSearch);
-        return ResponseEntity.status(HttpStatus.OK).body(savedWordSearch);
+            @RequestParam(name = "words") List<String> wordList) {
+        if (wordList == null || wordList.isEmpty()) throw new EntityNotFoundException("Lista de palavras vazia.");
+        if (gridSize < 3) throw new EntityNotFoundException("Grid deve ser de no mínimo 4x4.");
+
+        return ResponseEntity.status(HttpStatus.OK).body(wordSearchService.generateWordSearch(gridSize, wordList));
     }
 }

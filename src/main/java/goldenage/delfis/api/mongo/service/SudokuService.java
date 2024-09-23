@@ -8,6 +8,8 @@
 package goldenage.delfis.api.mongo.service;
 
 import goldenage.delfis.api.mongo.model.Sudoku;
+import goldenage.delfis.api.mongo.model.SudokuGenerator;
+import goldenage.delfis.api.mongo.model.SudokuType;
 import goldenage.delfis.api.mongo.repository.SudokuRepository;
 import org.springframework.stereotype.Service;
 
@@ -34,5 +36,13 @@ public class SudokuService {
      */
     public Sudoku saveSudoku(Sudoku sudoku) {
         return sudokuRepository.save(sudoku);
+    }
+
+    /**
+     * @return sudoku inserido.
+     */
+    public Sudoku generateSudoku() {
+        Sudoku generatedSudoku = SudokuGenerator.generateRandomSudoku(SudokuType.SIXBYSIX);
+        return saveSudoku(generatedSudoku);
     }
 }

@@ -9,6 +9,7 @@ package goldenage.delfis.api.mongo.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -32,7 +33,7 @@ public class WordSearch {
     @Schema(description = "Grid do jogo representado como uma string onde cada linha é separada por quebras de linha.", example = "A B C D\nE F G H\nI J K L\nM N O P")
     private String grid;
 
-    @Min(value = 3)
+    @Min(value = 4)
     @Schema(description = "Tamanho do grid do jogo, que é uma dimensão do grid quadrado.", example = "10")
     private int gridSize;
 
@@ -49,13 +50,12 @@ public class WordSearch {
         }
     }
 
-    public WordSearch(int gridSize, String wordList) {
+    public WordSearch(int gridSize, List<String> wordList) {
         this.gridSize = gridSize;
 
-        List<String> words = Arrays.asList(wordList.split(","));
-        this.words = words;
+        this.words = wordList;
 
-        char[][] grid = generateGrid(gridSize, words);
+        char[][] grid = generateGrid(gridSize, wordList);
         String gridToString = "";
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {

@@ -55,8 +55,6 @@ public class SudokuController {
             @ApiResponse(responseCode = "200", description = "Sudoku gerado com sucesso", content = @Content(schema = @Schema(implementation = Sudoku.class))),
     })
     public ResponseEntity<Sudoku> generateSudoku() {
-        Sudoku generatedSudoku = SudokuGenerator.generateRandomSudoku(SudokuType.SIXBYSIX);
-        Sudoku savedSudoku = sudokuService.saveSudoku(generatedSudoku);
-        return ResponseEntity.status(HttpStatus.OK).body(savedSudoku);
+        return ResponseEntity.status(HttpStatus.OK).body(sudokuService.generateSudoku());
     }
 }

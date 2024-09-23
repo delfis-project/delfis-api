@@ -35,4 +35,12 @@ public class WordSearchService {
     public WordSearch saveWordSearch(WordSearch wordSearch) {
         return wordSearchRepository.save(wordSearch);
     }
+
+    /**
+     * @return caça-palavras inserido.
+     */
+    public WordSearch generateWordSearch(int gridSize, List<String> wordList) {
+        WordSearch generatedWordSearch = new WordSearch(gridSize, wordList);
+        return saveWordSearch(generatedWordSearch);
+    }
 }
