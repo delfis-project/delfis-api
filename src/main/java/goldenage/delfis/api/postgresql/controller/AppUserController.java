@@ -40,6 +40,14 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/app-user")
 public class AppUserController {
+
+    private static final int DEFAULT_PLAN = 1;
+    private static final int DEFAULT_LEVEL = 1;
+    private static final int DEFAULT_POINTS = 0;
+    private static final int DEFAULT_ROLE = 1;
+    private static final int DEFAULT_COINS = 0;
+
+
     private final AppUserService appUserService;
     private final PlanService planService;
     private final UserRoleService userRoleService;
@@ -155,7 +163,11 @@ public class AppUserController {
             @Valid @RequestBody AppUser appUser) {
         try {
             appUser.setCreatedAt(LocalDateTime.now());
-            appUser.setLevel(1);
+            appUser.setLevel(DEFAULT_LEVEL);
+            appUser.setPoints(DEFAULT_POINTS);
+            appUser.setFkUserRoleId(DEFAULT_ROLE);
+            appUser.setFkPlanId(DEFAULT_PLAN);
+            appUser.setCoins(DEFAULT_COINS);
 
             verifyFks(appUser);
 
