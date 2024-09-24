@@ -7,12 +7,10 @@
 
 package goldenage.delfis.api.postgresql.controller;
 
-import goldenage.delfis.api.postgresql.model.Address;
 import goldenage.delfis.api.postgresql.model.Plan;
 import goldenage.delfis.api.postgresql.model.UserRole;
 import goldenage.delfis.api.postgresql.util.ControllerUtils;
 import goldenage.delfis.api.postgresql.model.AppUser;
-import goldenage.delfis.api.postgresql.service.AddressService;
 import goldenage.delfis.api.postgresql.service.AppUserService;
 import goldenage.delfis.api.postgresql.service.PlanService;
 import goldenage.delfis.api.postgresql.service.UserRoleService;
@@ -51,13 +49,11 @@ public class AppUserController {
     private final AppUserService appUserService;
     private final PlanService planService;
     private final UserRoleService userRoleService;
-    private final AddressService addressService;
 
-    public AppUserController(AppUserService appUserService, PlanService planService, UserRoleService userRoleService, AddressService addressService) {
+    public AppUserController(AppUserService appUserService, PlanService planService, UserRoleService userRoleService) {
         this.appUserService = appUserService;
         this.planService = planService;
         this.userRoleService = userRoleService;
-        this.addressService = addressService;
     }
 
     @GetMapping("/get-all")
@@ -262,11 +258,6 @@ public class AppUserController {
                         if (userRole == null) throw new ClassCastException("Role não encontrado.");
                         existingAppUser.setFkUserRoleId(userRole.getId());
                     }
-                    case "fkAddressId" -> {
-                        Address address = addressService.getAddressById(((Integer) value).longValue());
-                        if (address == null) throw new ClassCastException("Endereço não encontrado.");
-                        existingAppUser.setFkAddressId(address.getId());
-                    }
                     default -> throw new IllegalArgumentException("Campo " + key + " não é atualizável.");
                 }
             } catch (ClassCastException e) {
@@ -292,9 +283,5 @@ public class AppUserController {
         UserRole userRole = userRoleService.getUserRoleById(appUser.getFkUserRoleId());
         if (userRole == null) throw new EntityNotFoundException("Role não encontrado.");
         appUser.setFkUserRoleId(userRole.getId());
-
-        Address address = addressService.getAddressById(appUser.getFkAddressId());
-        if (address == null) throw new EntityNotFoundException("Endereço não encontrado.");
-        appUser.setFkAddressId(address.getId());
     }
 }

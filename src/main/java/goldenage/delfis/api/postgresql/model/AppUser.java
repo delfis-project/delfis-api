@@ -88,11 +88,6 @@ public class AppUser {
     @NotNull(message = "O usuário deve ter um papel")
     private long fkUserRoleId;
 
-    @Column(name = "fk_address_id")
-    @Schema(description = "Fk do endereço do usuário", example = "1")
-    @NotNull(message = "O usuário deve ter um endereço")
-    private long fkAddressId;
-
     @Column(name = "created_at")
     @Schema(description = "Data e hora de criação da conta", example = "2024-08-15T14:30:00")
     private LocalDateTime createdAt;
