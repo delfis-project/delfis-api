@@ -18,3 +18,5 @@ Serviço hospedado no Render: https://delfis-api.onrender.com
 
 ## Para mais informações
 Visite a documentação completa no endpoint /swagger-ui/index.html!
+<br/>
+Desenvolvedor: [@joaodinizaraujo](https://github.com/joaodinizaraujo)
