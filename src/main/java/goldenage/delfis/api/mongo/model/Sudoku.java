@@ -19,7 +19,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Schema(description = "Modelo que representa um tabuleiro de Sudoku")
 @Document
 public class Sudoku {
-
     @ArraySchema(schema = @Schema(description = "Tabuleiro do Sudoku com as posições preenchidas e vazias", example = "[[\"5\", \"3\", \"\", ...], [...]]"))
     protected String[][] board;
 
@@ -41,13 +40,7 @@ public class Sudoku {
     @ArraySchema(schema = @Schema(description = "Valores válidos para o Sudoku", example = "[\"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\"]"))
     private String[] VALIDVALUES;
 
-    public Sudoku(
-            @Schema(description = "Número de linhas do tabuleiro", example = "9") int rows,
-            @Schema(description = "Número de colunas do tabuleiro", example = "9") int columns,
-            @Schema(description = "Largura da caixa do Sudoku", example = "3") int boxWidth,
-            @Schema(description = "Altura da caixa do Sudoku", example = "3") int boxHeight,
-            @ArraySchema(schema = @Schema(description = "Valores válidos do Sudoku", example = "[\"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\"]")) String[] validValues
-    ) {
+    public Sudoku(int rows, int columns, int boxWidth, int boxHeight, String[] validValues) {
         this.ROWS = rows;
         this.COLUMNS = columns;
         this.BOXWIDTH = boxWidth;
@@ -59,8 +52,7 @@ public class Sudoku {
         initializeMutableSlots();
     }
 
-    public Sudoku(
-            @Schema(description = "Outro tabuleiro de Sudoku para copiar os valores") Sudoku puzzle) {
+    public Sudoku(Sudoku puzzle) {
         this.ROWS = puzzle.ROWS;
         this.COLUMNS = puzzle.COLUMNS;
         this.BOXWIDTH = puzzle.BOXWIDTH;
@@ -76,58 +68,18 @@ public class Sudoku {
         }
     }
 
-    @Schema(description = "Retorna o número de linhas do tabuleiro", example = "9")
-    public int getNumRows() {
-        return this.ROWS;
-    }
-
-    @Schema(description = "Retorna o número de colunas do tabuleiro", example = "9")
-    public int getNumColumns() {
-        return this.COLUMNS;
-    }
-
-    @Schema(description = "Retorna a largura da caixa do Sudoku", example = "3")
-    public int getBoxWidth() {
-        return this.BOXWIDTH;
-    }
-
-    @Schema(description = "Retorna a altura da caixa do Sudoku", example = "3")
-    public int getBoxHeight() {
-        return this.BOXHEIGHT;
-    }
-
-    @ArraySchema(schema = @Schema(description = "Valores válidos para o Sudoku", example = "[\"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\"]"))
-    public String[] getValidValues() {
-        return this.VALIDVALUES;
-    }
-
-    @Schema(description = "Faz uma jogada no tabuleiro")
-    public void makeMove(
-            @Schema(description = "Número da linha", example = "0") int row,
-            @Schema(description = "Número da coluna", example = "0") int col,
-            @Schema(description = "Valor a ser inserido", example = "5") String value,
-            @Schema(description = "Indica se a célula é mutável", example = "true") boolean isMutable
-    ) {
+    public void makeMove(int row, int col, String value, boolean isMutable) {
         if (this.isValidValue(value) && this.isValidMove(row, col, value) && this.isSlotMutable(row, col)) {
             this.board[row][col] = value;
             this.mutable[row][col] = isMutable;
         }
     }
 
-    @Schema(description = "Verifica se o movimento é válido")
-    public boolean isValidMove(
-            @Schema(description = "Número da linha", example = "0") int row,
-            @Schema(description = "Número da coluna", example = "0") int col,
-            @Schema(description = "Valor a ser verificado", example = "5") String value
-    ) {
+    public boolean isValidMove(int row, int col, String value) {
         return this.inRange(row, col) && !this.numInCol(col, value) && !this.numInRow(row, value) && !this.numInBox(row, col, value);
     }
 
-    @Schema(description = "Verifica se o valor já está presente na coluna")
-    public boolean numInCol(
-            @Schema(description = "Número da coluna", example = "0") int col,
-            @Schema(description = "Valor a ser verificado", example = "5") String value
-    ) {
+    public boolean numInCol(int col, String value) {
         if (col <= this.COLUMNS) {
             for (int row = 0; row < this.ROWS; row++) {
                 if (this.board[row][col].equals(value)) {
@@ -138,11 +90,7 @@ public class Sudoku {
         return false;
     }
 
-    @Schema(description = "Verifica se o valor já está presente na linha")
-    public boolean numInRow(
-            @Schema(description = "Número da linha", example = "0") int row,
-            @Schema(description = "Valor a ser verificado", example = "5") String value
-    ) {
+    public boolean numInRow(int row, String value) {
         if (row <= this.ROWS) {
             for (int col = 0; col < this.COLUMNS; col++) {
                 if (this.board[row][col].equals(value)) {
@@ -153,12 +101,7 @@ public class Sudoku {
         return false;
     }
 
-    @Schema(description = "Verifica se o valor já está presente na caixa")
-    public boolean numInBox(
-            @Schema(description = "Número da linha", example = "0") int row,
-            @Schema(description = "Número da coluna", example = "0") int col,
-            @Schema(description = "Valor a ser verificado", example = "5") String value
-    ) {
+    public boolean numInBox(int row, int col, String value) {
         if (this.inRange(row, col)) {
             int boxRow = row / this.BOXHEIGHT;
             int boxCol = col / this.BOXWIDTH;
@@ -177,57 +120,32 @@ public class Sudoku {
         return false;
     }
 
-    @Schema(description = "Verifica se a célula está disponível para preenchimento")
-    public boolean isSlotAvailable(
-            @Schema(description = "Número da linha", example = "0") int row,
-            @Schema(description = "Número da coluna", example = "0") int col
-    ) {
+    public boolean isSlotAvailable(int row, int col) {
         return (this.inRange(row, col) && this.board[row][col].equals("") && this.isSlotMutable(row, col));
     }
 
-    @Schema(description = "Verifica se a célula é mutável")
-    public boolean isSlotMutable(
-            @Schema(description = "Número da linha", example = "0") int row,
-            @Schema(description = "Número da coluna", example = "0") int col
-    ) {
+    public boolean isSlotMutable(int row, int col) {
         return this.mutable[row][col];
     }
 
-    @Schema(description = "Retorna o valor presente na célula")
-    public String getValue(
-            @Schema(description = "Número da linha", example = "0") int row,
-            @Schema(description = "Número da coluna", example = "0") int col
-    ) {
+    public String getValue(int row, int col) {
         if (this.inRange(row, col)) {
             return this.board[row][col];
         }
         return "";
     }
 
-    @Schema(description = "Retorna o tabuleiro do Sudoku")
-    public String[][] getBoard() {
-        return this.board;
-    }
-
-    @Schema(description = "Verifica se o valor é válido")
-    private boolean isValidValue(
-            @Schema(description = "Valor a ser verificado", example = "5") String value
-    ) {
+    private boolean isValidValue(String value) {
         for (String str : this.VALIDVALUES) {
             if (str.equals(value)) return true;
         }
         return false;
     }
 
-    @Schema(description = "Verifica se a célula está dentro do intervalo")
-    public boolean inRange(
-            @Schema(description = "Número da linha", example = "0") int row,
-            @Schema(description = "Número da coluna", example = "0") int col
-    ) {
+    public boolean inRange(int row, int col) {
         return row <= this.ROWS && col <= this.COLUMNS && row >= 0 && col >= 0;
     }
 
-    @Schema(description = "Verifica se o tabuleiro está completo")
     public boolean boardFull() {
         for (int r = 0; r < this.ROWS; r++) {
             for (int c = 0; c < this.COLUMNS; c++) {
@@ -237,16 +155,47 @@ public class Sudoku {
         return true;
     }
 
-    @Schema(description = "Esvazia a célula do tabuleiro")
-    public void makeSlotEmpty(
-            @Schema(description = "Número da linha", example = "0") int row,
-            @Schema(description = "Número da coluna", example = "0") int col
-    ) {
+    public void makeSlotEmpty(int row, int col) {
         this.board[row][col] = "";
     }
 
+    private void initializeBoard() {
+        for (int row = 0; row < this.ROWS; row++) {
+            for (int col = 0; col < this.COLUMNS; col++) {
+                this.board[row][col] = "";
+            }
+        }
+    }
+
+    private void initializeMutableSlots() {
+        for (int row = 0; row < this.ROWS; row++) {
+            for (int col = 0; col < this.COLUMNS; col++) {
+                this.mutable[row][col] = true;
+            }
+        }
+    }
+
+    public int getNumRows() {
+        return this.ROWS;
+    }
+
+    public int getNumColumns() {
+        return this.COLUMNS;
+    }
+
+    public int getBoxWidth() {
+        return this.BOXWIDTH;
+    }
+
+    public int getBoxHeight() {
+        return this.BOXHEIGHT;
+    }
+
+    public String[] getValidValues() {
+        return this.VALIDVALUES;
+    }
+
     @Override
-    @Schema(description = "Retorna o tabuleiro como string")
     public String toString() {
         String str = "Game Board:\n";
         for (int row = 0; row < this.ROWS; row++) {
@@ -256,23 +205,5 @@ public class Sudoku {
             str += "\n";
         }
         return str + "\n";
-    }
-
-    @Schema(description = "Inicializa o tabuleiro com células vazias")
-    private void initializeBoard() {
-        for (int row = 0; row < this.ROWS; row++) {
-            for (int col = 0; col < this.COLUMNS; col++) {
-                this.board[row][col] = "";
-            }
-        }
-    }
-
-    @Schema(description = "Inicializa as células mutáveis")
-    private void initializeMutableSlots() {
-        for (int row = 0; row < this.ROWS; row++) {
-            for (int col = 0; col < this.COLUMNS; col++) {
-                this.mutable[row][col] = true;
-            }
-        }
     }
 }

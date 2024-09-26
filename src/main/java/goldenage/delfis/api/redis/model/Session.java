@@ -33,8 +33,4 @@ public class Session {
 
     @Schema(description = "Data e hora de término da sessão", example = "2024-09-23T09:30:00")
     private LocalDateTime finalDatetime;
-
-    public boolean isActive() {
-        return finalDatetime == null;
-    }
 }

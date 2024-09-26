@@ -41,10 +41,10 @@ public class SudokuController {
             @ApiResponse(responseCode = "200", description = "Lista de Sudokus encontrados", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Sudoku.class)))),
             @ApiResponse(responseCode = "404", description = "Nenhum Sudoku encontrado", content = @Content)
     })
-    public ResponseEntity<List<Sudoku>> getSudokues() {
-        List<Sudoku> sudokues = sudokuService.getSudokus();
-        if (sudokues != null && !sudokues.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.OK).body(sudokues);
+    public ResponseEntity<List<Sudoku>> getSudokus() {
+        List<Sudoku> sudokus = sudokuService.getSudokus();
+        if (sudokus != null && !sudokus.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body(sudokus);
         }
         throw new EntityNotFoundException("Nenhum Sudoku encontrado.");
     }
