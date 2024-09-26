@@ -1,4 +1,3 @@
-sql:
 migrar logica/services
 foto preview tema
 periodicidade plano
