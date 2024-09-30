@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -53,8 +54,8 @@ public class WordSearchController {
     public ResponseEntity<WordSearch> generateWordSearch(
             @RequestParam(name = "gridSize") int gridSize,
             @RequestParam(name = "words") List<String> wordList) {
-        if (wordList == null || wordList.isEmpty()) throw new EntityNotFoundException("Lista de palavras vazia.");
-        if (gridSize < 3) throw new EntityNotFoundException("Grid deve ser de no mínimo 4x4.");
+        if (wordList == null || wordList.isEmpty()) throw new DataIntegrityViolationException("Lista de palavras vazia.");
+        if (gridSize < 3) throw new DataIntegrityViolationException("Grid deve ser de no mínimo 4x4.");
 
         return ResponseEntity.status(HttpStatus.OK).body(wordSearchService.generateWordSearch(gridSize, wordList));
     }

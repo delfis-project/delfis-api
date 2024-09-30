@@ -27,7 +27,6 @@ import java.util.concurrent.ThreadLocalRandom;
 @Schema(description = "Representa um jogo de caça-palavras.")
 @Document
 public class WordSearch {
-
     private static final String ALL_CAP_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     @Schema(description = "Grid do jogo representado como uma string onde cada linha é separada por quebras de linha.", example = "A B C D\nE F G H\nI J K L\nM N O P")
