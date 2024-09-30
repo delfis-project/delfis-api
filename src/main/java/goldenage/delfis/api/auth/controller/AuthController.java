@@ -66,7 +66,6 @@ public class AuthController {
                         .signWith(secretKey, SignatureAlgorithm.HS512)
                         .compact();
 
-                logger.info("Token gerado: {}", token);
                 return ResponseEntity.status(HttpStatus.OK).body(Map.of("token", "Bearer " + token));
             } catch (Exception e) {
                 logger.error("Erro ao gerar o token JWT: ", e);
