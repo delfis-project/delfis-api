@@ -43,4 +43,12 @@ public class WordSearchService {
         WordSearch generatedWordSearch = new WordSearch(gridSize, wordList);
         return saveWordSearch(generatedWordSearch);
     }
+
+    /**
+     * @return número de ocorrências da palavra.
+     */
+    public int countOccurrencesOfWord(String word) {
+        Integer count = wordSearchRepository.countOccurrencesOfWord(word);
+        return count == null ? 0 : count;
+    }
 }
