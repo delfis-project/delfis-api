@@ -46,6 +46,15 @@ public class WordSearchController {
         throw new EntityNotFoundException("Nenhum caça-palavras encontrado.");
     }
 
+    @GetMapping("/get-occurrences-by-word/{word}")
+    @Operation(summary = "Obter a contagem de ocorrências de uma palavra", description = "Retorna o número total de ocorrências da palavra especificada em todos os caça-palavras.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Contagem de ocorrências retornada com sucesso", content = @Content(schema = @Schema(implementation = Integer.class))),
+    })
+    public ResponseEntity<Integer> getOccurrencesByWord(@PathVariable String word) {
+        return ResponseEntity.status(HttpStatus.OK).body(wordSearchService.countOccurrencesOfWord(word));
+    }
+
     @PostMapping("/generate")
     @Operation(summary = "Gerar um novo caça-palavras", description = "Gera um novo caça-palavras com o tamanho de grid especificado e a lista de palavras fornecida.")
     @ApiResponses(value = {

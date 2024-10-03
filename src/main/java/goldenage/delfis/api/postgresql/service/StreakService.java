@@ -48,6 +48,14 @@ public class StreakService {
     }
 
     /**
+     * @return streak aberto do usuário.
+     */
+    public Streak getOpenStreakByAppUserId(Long id) {
+        return streakRepository.findStreakByFkAppUserIdAndFinalDateEquals(id, null)
+                .orElse(null);
+    }
+
+    /**
      * @return streak pelo usuário.
      */
     public List<Streak> getStreaksByAppUserId(Long id) {
