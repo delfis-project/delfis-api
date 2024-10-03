@@ -11,6 +11,7 @@ import goldenage.delfis.api.redis.model.Session;
 import goldenage.delfis.api.redis.repository.SessionRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,12 +39,20 @@ public class SessionService {
 
         return sessions.stream()
                 .filter(session -> session.getFkAppUserId() == fkAppUserId && session.getFinalDatetime() == null)
+                .sorted((s1, s2) -> s2.getInitialDatetime().compareTo(s1.getInitialDatetime()))
                 .findFirst()
                 .orElse(null);
     }
 
-    public boolean deleteSession(Session session) {
-        sessionRepository.deleteById(session.getId());
-        return sessionRepository.findById(session.getId()).isEmpty();
+    public boolean deleteSession(String id) {
+        sessionRepository.deleteById(id);
+        return sessionRepository.findById(id).isEmpty();
+    }
+
+    public Session finishSession(String sessionId) {
+        return sessionRepository.findById(sessionId).map(existingSession -> {
+            existingSession.setFinalDatetime(LocalDateTime.now());
+            return sessionRepository.save(existingSession);
+        }).orElseThrow(() -> new IllegalArgumentException("Sessão não encontrada com ID: " + sessionId));
     }
 }
