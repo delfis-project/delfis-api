@@ -93,7 +93,6 @@ public class AppUserService {
      */
     public AppUser saveAppUser(AppUser appUser) {
         appUser.setName(appUser.getName().strip().toUpperCase());
-        appUser.setPassword(new BCryptPasswordEncoder().encode(appUser.getPassword()));
         return appUserRepository.save(appUser);
     }
 }
