@@ -63,6 +63,20 @@ public class SessionController {
         return ResponseEntity.status(HttpStatus.OK).body(sessionService.saveSession(session));
     }
 
+    @DeleteMapping("/delete/{id}")
+    @Operation(summary = "Deletar uma sessão", description = "Deleta uma sessão com o ID fornecido.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Sessão deletada com sucesso", content = @Content(schema = @Schema(implementation = Boolean.class))),
+            @ApiResponse(responseCode = "404", description = "Sessão não encontrada para o ID fornecido", content = @Content)
+    })
+    public ResponseEntity<Boolean> deleteSession(@PathVariable String id) {
+        boolean haveDeleted = sessionService.deleteSession(id);
+        if (haveDeleted)
+            return ResponseEntity.status(HttpStatus.OK).body(true);
+
+        throw new EntityNotFoundException("Sem sessões para o ID enviado.");
+    }
+
     @PostMapping("/finish/{fkAppUserId}")
     @Operation(summary = "Finalizar uma sessão", description = "Finaliza uma sessão aberta atualizando o campo finalDatetime com a data/hora de finalização.")
     @ApiResponses(value = {
@@ -74,11 +88,7 @@ public class SessionController {
         Session session = sessionService.getUnfinishedSessionByFkAppUserById(fkAppUserId);
         if (session == null) throw new EntityNotFoundException("Nenhuma sessão aberta desse usuário.");
 
-        boolean haveDeleted = sessionService.deleteSession(session);
-        if(!haveDeleted) throw new RuntimeException("Erro durante delete.");
-        session.setFinalDatetime(LocalDateTime.now());
-
-        return ResponseEntity.status(HttpStatus.OK).body(sessionService.saveSession(session));
+        return ResponseEntity.status(HttpStatus.OK).body(sessionService.finishSession(session.getId()));
     }
 
     private void verifyFk(long fkAppUserId) {
