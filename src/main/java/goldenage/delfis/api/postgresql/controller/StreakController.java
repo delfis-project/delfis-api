@@ -30,6 +30,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/streak")
@@ -81,6 +82,27 @@ public class StreakController {
             @PathVariable Long id) {
         List<Streak> streaks = streakService.getStreaksByAppUserId(id);
         if (streaks != null) return ResponseEntity.status(HttpStatus.OK).body(streaks);
+
+        throw new EntityNotFoundException("Nenhum streak encontrado para o usuário fornecido.");
+    }
+
+    @GetMapping("/get-current-streak-by-app-user-id/{id}")
+    @Operation(summary = "Obter streak atual por usuário",
+            description = "Retorna o streak atual associado ao usuário fornecido. Um streak é uma sequência de atividades contínuas.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Streak atual encontrado",
+                    content = @Content(schema = @Schema(implementation = Streak.class))),
+            @ApiResponse(responseCode = "404",
+                    description = "Nenhum streak encontrado para o usuário fornecido",
+                    content = @Content)
+    })
+    public ResponseEntity<Streak> getCurrentStreakByAppUserId(
+            @Parameter(description = "ID do usuário para filtragem do streak", required = true)
+            @PathVariable Long id) {
+        Streak streak = streakService.getOpenStreakByAppUserId(id);
+        if (streak != null)
+            return ResponseEntity.status(HttpStatus.OK).body(streak);
 
         throw new EntityNotFoundException("Nenhum streak encontrado para o usuário fornecido.");
     }

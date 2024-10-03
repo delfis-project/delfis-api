@@ -12,8 +12,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface StreakRepository extends JpaRepository<Streak, Long> {
     List<Streak> findStreaksByInitialDateBefore(LocalDate initialDate);
     List<Streak> findStreaksByFkAppUserId(Long id);
+    Optional<Streak> findStreakByFkAppUserIdAndFinalDateEquals(Long id, LocalDate date);
 }
