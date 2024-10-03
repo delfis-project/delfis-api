@@ -164,6 +164,7 @@ public class AppUserController {
             appUser.setFkUserRoleId(DEFAULT_ROLE);
             appUser.setFkPlanId(DEFAULT_PLAN);
             appUser.setCoins(DEFAULT_COINS);
+            appUser.setPassword(new BCryptPasswordEncoder().encode(appUser.getPassword()));
 
             verifyFks(appUser);
 
@@ -242,7 +243,7 @@ public class AppUserController {
                     case "name" -> existingAppUser.setName(((String) value).strip().toUpperCase());
                     case "username" -> existingAppUser.setUsername((String) value);
                     case "email" -> existingAppUser.setEmail((String) value);
-                    case "password" -> existingAppUser.setPassword((String) value);
+                    case "password" -> existingAppUser.setPassword(new BCryptPasswordEncoder().encode((String) value));
                     case "level" -> existingAppUser.setLevel((Integer) value);
                     case "points" -> existingAppUser.setPoints((Integer) value);
                     case "coins" -> existingAppUser.setCoins((Integer) value);
