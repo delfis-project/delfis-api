@@ -9,6 +9,7 @@ package goldenage.delfis.api.redis.service;
 
 import goldenage.delfis.api.redis.model.Session;
 import goldenage.delfis.api.redis.repository.SessionRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -45,6 +46,8 @@ public class SessionService {
     }
 
     public boolean deleteSession(String id) {
+        if (sessionRepository.findById(id).isEmpty())
+            throw new EntityNotFoundException("Sem sessões para o ID enviado.");
         sessionRepository.deleteById(id);
         return sessionRepository.findById(id).isEmpty();
     }

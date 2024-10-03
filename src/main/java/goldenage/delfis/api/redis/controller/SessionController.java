@@ -70,11 +70,7 @@ public class SessionController {
             @ApiResponse(responseCode = "404", description = "Sessão não encontrada para o ID fornecido", content = @Content)
     })
     public ResponseEntity<Boolean> deleteSession(@PathVariable String id) {
-        boolean haveDeleted = sessionService.deleteSession(id);
-        if (haveDeleted)
-            return ResponseEntity.status(HttpStatus.OK).body(true);
-
-        throw new EntityNotFoundException("Sem sessões para o ID enviado.");
+        return ResponseEntity.status(HttpStatus.OK).body(sessionService.deleteSession(id));
     }
 
     @PostMapping("/finish/{fkAppUserId}")
