@@ -32,17 +32,22 @@ public class SessionService {
     public List<Session> getSessions() {
         List<Session> sessions = new ArrayList<>();
         sessionRepository.findAll().forEach(sessions::add);
-        return sessions;
+        return !sessions.isEmpty() ? sessions : null;
     }
 
     public Session getUnfinishedSessionByFkAppUserById(long fkAppUserId) {
-        List<Session> sessions = getSessions();
+        List<Session> sessions = sessionRepository.findSessionByFkAppUserIdAndFinalDatetimeIsNull(fkAppUserId);
 
         return sessions.stream()
                 .filter(session -> session.getFkAppUserId() == fkAppUserId && session.getFinalDatetime() == null)
                 .sorted((s1, s2) -> s2.getInitialDatetime().compareTo(s1.getInitialDatetime()))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public List<Session> getFinishedSessionsByFkAppUserId(long fkAppUserId) {
+        List<Session> sessions = sessionRepository.findSessionByFkAppUserIdAndFinalDatetimeIsNotNull(fkAppUserId);
+        return !sessions.isEmpty() ? sessions : null;
     }
 
     public boolean deleteSession(String id) {
@@ -56,6 +61,6 @@ public class SessionService {
         return sessionRepository.findById(sessionId).map(existingSession -> {
             existingSession.setFinalDatetime(LocalDateTime.now());
             return sessionRepository.save(existingSession);
-        }).orElseThrow(() -> new IllegalArgumentException("Sessão não encontrada com ID: " + sessionId));
+        }).orElseThrow(() -> new EntityNotFoundException("Sessão não encontrada com ID: " + sessionId));
     }
 }
