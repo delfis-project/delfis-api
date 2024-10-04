@@ -9,6 +9,7 @@ package goldenage.delfis.api.redis.service;
 
 import goldenage.delfis.api.redis.model.Session;
 import goldenage.delfis.api.redis.repository.SessionRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -31,11 +32,11 @@ public class SessionService {
     public List<Session> getSessions() {
         List<Session> sessions = new ArrayList<>();
         sessionRepository.findAll().forEach(sessions::add);
-        return sessions;
+        return !sessions.isEmpty() ? sessions : null;
     }
 
     public Session getUnfinishedSessionByFkAppUserById(long fkAppUserId) {
-        List<Session> sessions = getSessions();
+        List<Session> sessions = sessionRepository.findSessionByFkAppUserIdAndFinalDatetimeIsNull(fkAppUserId);
 
         return sessions.stream()
                 .filter(session -> session.getFkAppUserId() == fkAppUserId && session.getFinalDatetime() == null)
@@ -44,7 +45,14 @@ public class SessionService {
                 .orElse(null);
     }
 
+    public List<Session> getFinishedSessionsByFkAppUserId(long fkAppUserId) {
+        List<Session> sessions = sessionRepository.findSessionByFkAppUserIdAndFinalDatetimeIsNotNull(fkAppUserId);
+        return !sessions.isEmpty() ? sessions : null;
+    }
+
     public boolean deleteSession(String id) {
+        if (sessionRepository.findById(id).isEmpty())
+            throw new EntityNotFoundException("Sem sessões para o ID enviado.");
         sessionRepository.deleteById(id);
         return sessionRepository.findById(id).isEmpty();
     }
@@ -53,6 +61,6 @@ public class SessionService {
         return sessionRepository.findById(sessionId).map(existingSession -> {
             existingSession.setFinalDatetime(LocalDateTime.now());
             return sessionRepository.save(existingSession);
-        }).orElseThrow(() -> new IllegalArgumentException("Sessão não encontrada com ID: " + sessionId));
+        }).orElseThrow(() -> new EntityNotFoundException("Sessão não encontrada com ID: " + sessionId));
     }
 }

@@ -22,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -29,7 +30,6 @@ import java.util.List;
 @RequestMapping("/api/session")
 @Schema(description = "Controlador responsável pela gestão de sessões")
 public class SessionController {
-
     private final SessionService sessionService;
     private final AppUserService appUserService;
 
@@ -46,9 +46,8 @@ public class SessionController {
     })
     public ResponseEntity<List<Session>> getSessions() {
         List<Session> sessions = sessionService.getSessions();
-        if (sessions != null && !sessions.isEmpty()) {
+        if (sessions != null && !sessions.isEmpty())
             return ResponseEntity.status(HttpStatus.OK).body(sessions);
-        }
         throw new EntityNotFoundException("Nenhuma sessão encontrada.");
     }
 
@@ -70,11 +69,7 @@ public class SessionController {
             @ApiResponse(responseCode = "404", description = "Sessão não encontrada para o ID fornecido", content = @Content)
     })
     public ResponseEntity<Boolean> deleteSession(@PathVariable String id) {
-        boolean haveDeleted = sessionService.deleteSession(id);
-        if (haveDeleted)
-            return ResponseEntity.status(HttpStatus.OK).body(true);
-
-        throw new EntityNotFoundException("Sem sessões para o ID enviado.");
+        return ResponseEntity.status(HttpStatus.OK).body(sessionService.deleteSession(id));
     }
 
     @PostMapping("/finish/{fkAppUserId}")
@@ -89,6 +84,27 @@ public class SessionController {
         if (session == null) throw new EntityNotFoundException("Nenhuma sessão aberta desse usuário.");
 
         return ResponseEntity.status(HttpStatus.OK).body(sessionService.finishSession(session.getId()));
+    }
+
+    @GetMapping("/get-total-session-time-by-app-user-id/{fkAppUserId}")
+    @Operation(summary = "Obter tempo total de sessão por ID de usuário",
+            description = "Retorna o tempo total de todas as sessões finalizadas de um usuário, em minutos.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Tempo total de sessão calculado com sucesso",
+                    content = @Content(schema = @Schema(implementation = Double.class))),
+            @ApiResponse(responseCode = "404", description = "Nenhuma sessão finalizada encontrada para o usuário fornecido",
+                    content = @Content)
+    })
+    public ResponseEntity<Double> getTotalSessionTimeByFkAppUserId(@PathVariable long fkAppUserId) {
+        List<Session> sessions = sessionService.getFinishedSessionsByFkAppUserId(fkAppUserId);
+        if (sessions == null || sessions.isEmpty())
+            throw new EntityNotFoundException("Sem sessões finalizadas para o ID informado.");
+
+        return ResponseEntity.status(HttpStatus.OK).body(sessions
+                .stream()
+                .map(session -> Duration.between(session.getInitialDatetime(), session.getFinalDatetime()))
+                .reduce(Duration.ZERO, Duration::plus)
+                .getSeconds() / 60.0);
     }
 
     private void verifyFk(long fkAppUserId) {

@@ -9,9 +9,9 @@ package goldenage.delfis.api.postgresql.service;
 
 import goldenage.delfis.api.postgresql.model.AppUser;
 import goldenage.delfis.api.postgresql.repository.AppUserRepository;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,7 +67,9 @@ public class AppUserService {
      * @return appUsers ordenado pelos pontos decrescente.
      */
     public List<AppUser> getLeaderboard() {
-        List<AppUser> appUsers = appUserRepository.findAllByOrderByPointsDesc();
+        List<Long> systemIds = new ArrayList<>();
+        systemIds.add(1L);
+        List<AppUser> appUsers = appUserRepository.findTop50ByIdIsNotInOrderByPointsDesc(systemIds);
         return appUsers.isEmpty() ? null : appUsers;
     }
 

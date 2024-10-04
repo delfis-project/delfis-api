@@ -18,5 +18,5 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     Optional<AppUser> findAppUserByUsernameEqualsIgnoreCase(String username);
     List<AppUser> findAppUsersByFkPlanIdEquals(Long id);
     List<AppUser> findAppUsersByFkUserRoleIdEquals(Long id);
-    List<AppUser> findAllByOrderByPointsDesc();
+    List<AppUser> findTop50ByIdIsNotInOrderByPointsDesc(List<Long> ids);
 }

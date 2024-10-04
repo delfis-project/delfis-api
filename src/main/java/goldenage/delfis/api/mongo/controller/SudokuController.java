@@ -9,8 +9,6 @@ package goldenage.delfis.api.mongo.controller;
 
 import goldenage.delfis.api.mongo.model.Sudoku;
 import goldenage.delfis.api.mongo.service.SudokuService;
-import goldenage.delfis.api.mongo.model.SudokuGenerator;
-import goldenage.delfis.api.mongo.model.SudokuType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -56,5 +54,23 @@ public class SudokuController {
     })
     public ResponseEntity<Sudoku> generateSudoku() {
         return ResponseEntity.status(HttpStatus.OK).body(sudokuService.generateSudoku());
+    }
+
+    @GetMapping("/get-sudokus-with-most-filled-cells")
+    @Operation(
+            summary = "Buscar Sudokus com Mais Células Preenchidas",
+            description = "Retorna uma lista de Sudokus que têm a maior quantidade de células preenchidas. " +
+                    "Útil para encontrar tabuleiros mais completos."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Sudokus encontrados com sucesso.", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Sudoku.class)))),
+            @ApiResponse(responseCode = "404", description = "Nenhum Sudoku encontrado.", content = @Content)
+    })
+    public ResponseEntity<List<Sudoku>> findSudokusWithMostFilledCells() {
+        List<Sudoku> sudokus = sudokuService.findSudokusWithMostFilledCells();
+        if (sudokus == null || sudokus.isEmpty())
+            throw new EntityNotFoundException("Nenhum sudoku encontrado.");
+
+        return ResponseEntity.status(HttpStatus.OK).body(sudokus);
     }
 }

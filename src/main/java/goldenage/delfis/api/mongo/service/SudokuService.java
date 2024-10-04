@@ -45,4 +45,9 @@ public class SudokuService {
         Sudoku generatedSudoku = SudokuGenerator.generateRandomSudoku(SudokuType.SIXBYSIX);
         return saveSudoku(generatedSudoku);
     }
+
+    public List<Sudoku> findSudokusWithMostFilledCells() {
+        List<Sudoku> sudokus = sudokuRepository.findSudokusWithMostFilledCells();
+        return sudokus.isEmpty() ? null : sudokus;
+    }
 }
