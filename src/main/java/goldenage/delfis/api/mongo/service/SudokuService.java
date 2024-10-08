@@ -42,7 +42,7 @@ public class SudokuService {
      * @return sudoku inserido.
      */
     public Sudoku generateSudoku() {
-        Sudoku generatedSudoku = SudokuGenerator.generateRandomSudoku(SudokuType.SIXBYSIX);
+        Sudoku generatedSudoku = SudokuGenerator.generateRandomSudoku(SudokuType.NINEBYNINE);
         return saveSudoku(generatedSudoku);
     }
 
