@@ -7,7 +7,9 @@
 
 package goldenage.delfis.api.postgresql.controller;
 
+import goldenage.delfis.api.postgresql.model.AppUserPowerup;
 import goldenage.delfis.api.postgresql.model.Powerup;
+import goldenage.delfis.api.postgresql.service.AppUserPowerupService;
 import goldenage.delfis.api.postgresql.util.ControllerUtils;
 import goldenage.delfis.api.postgresql.service.PowerupService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,9 +35,11 @@ import java.util.Map;
 @RequestMapping("/api/powerup")
 public class PowerupController {
     private final PowerupService powerupService;
+    private final AppUserPowerupService appUserPowerupService;
 
-    public PowerupController(PowerupService powerupService) {
+    public PowerupController(PowerupService powerupService, AppUserPowerupService appUserPowerupService) {
         this.powerupService = powerupService;
+        this.appUserPowerupService = appUserPowerupService;
     }
 
     @GetMapping("/get-all")
@@ -63,6 +68,27 @@ public class PowerupController {
         if (powerup != null) return ResponseEntity.status(HttpStatus.OK).body(powerup);
 
         throw new EntityNotFoundException("Nenhum powerup encontrado com o nome fornecido.");
+    }
+
+    @GetMapping("/get-by-app-user/{id}")
+    @Operation(summary = "Obter powerups por usuário", description = "Retorna a lista de powerups associados a um usuário com o ID fornecido.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Powerups encontrados", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Powerup.class)))),
+            @ApiResponse(responseCode = "404", description = "Nenhum powerup encontrado", content = @Content)
+    })
+    public ResponseEntity<List<Powerup>> getPowerupsByAppUserId(
+            @Parameter(description = "ID do usuário cujos powerups devem ser buscados", required = true)
+            @PathVariable Long id) {
+
+        List<AppUserPowerup> appUserPowerups = appUserPowerupService.getAppUserPowerupsByAppUserId(id);
+        if (appUserPowerups == null) throw new EntityNotFoundException("Nenhum powerup encontrado.");
+
+        List<Powerup> powerups = new ArrayList<>();
+        for (AppUserPowerup appUserPowerup : appUserPowerups) {
+            powerups.add(powerupService.getPowerupById(appUserPowerup.getFkPowerupId()));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(powerups);
     }
 
     @PostMapping("/insert")
