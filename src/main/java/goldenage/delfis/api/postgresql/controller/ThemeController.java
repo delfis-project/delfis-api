@@ -7,6 +7,10 @@
 
 package goldenage.delfis.api.postgresql.controller;
 
+import goldenage.delfis.api.postgresql.model.AppUserPowerup;
+import goldenage.delfis.api.postgresql.model.AppUserTheme;
+import goldenage.delfis.api.postgresql.model.Powerup;
+import goldenage.delfis.api.postgresql.service.AppUserThemeService;
 import goldenage.delfis.api.postgresql.service.ThemeService;
 import goldenage.delfis.api.postgresql.util.ControllerUtils;
 import goldenage.delfis.api.postgresql.model.Theme;
@@ -33,9 +37,11 @@ import java.util.Map;
 @RequestMapping("/api/theme")
 public class ThemeController {
     private final ThemeService themeService;
+    private final AppUserThemeService appUserThemeService;
 
-    public ThemeController(ThemeService themeService) {
+    public ThemeController(ThemeService themeService, AppUserThemeService appUserThemeService) {
         this.themeService = themeService;
+        this.appUserThemeService = appUserThemeService;
     }
 
     @GetMapping("/get-all")
@@ -64,6 +70,27 @@ public class ThemeController {
         if (theme != null) return ResponseEntity.ok(theme);
 
         throw new EntityNotFoundException("Tema com o nome fornecido não encontrado.");
+    }
+
+    @GetMapping("/get-themes-by-app-user/{id}")
+    @Operation(summary = "Obter temas por usuário", description = "Retorna a lista de temas associados a um usuário com o ID fornecido.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Temas encontrados", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Theme.class)))),
+            @ApiResponse(responseCode = "404", description = "Nenhum tema encontrado", content = @Content)
+    })
+    public ResponseEntity<List<Theme>> getThemesByAppUserId(
+            @Parameter(description = "ID do usuário cujos temas devem ser buscados", required = true)
+            @PathVariable Long id) {
+
+        List<AppUserTheme> appUserThemes = appUserThemeService.getAppUserThemesByAppUserId(id);
+        if (appUserThemes == null) throw new EntityNotFoundException("Nenhum tema encontrado.");
+
+        List<Theme> themes = new ArrayList<>();
+        for (AppUserTheme appUserTheme : appUserThemes) {
+            themes.add(themeService.getThemeById(appUserTheme.getFkThemeId()));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(themes);
     }
 
     @PostMapping("/insert")
