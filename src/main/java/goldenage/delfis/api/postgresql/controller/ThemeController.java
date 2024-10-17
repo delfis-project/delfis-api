@@ -72,7 +72,7 @@ public class ThemeController {
         throw new EntityNotFoundException("Tema com o nome fornecido não encontrado.");
     }
 
-    @GetMapping("/get-themes-by-app-user/{id}")
+    @GetMapping("/get-by-app-user/{id}")
     @Operation(summary = "Obter temas por usuário", description = "Retorna a lista de temas associados a um usuário com o ID fornecido.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Temas encontrados", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Theme.class)))),
